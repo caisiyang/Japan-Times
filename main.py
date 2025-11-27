@@ -5,17 +5,17 @@ import os
 import datetime
 import time
 
-# 设置时区为 UTC+9 (日本时间)
-# GitHub Actions 服务器通常是 UTC+0，所以我们需要 +9
+# 设置时区 UTC+9
 JST_OFFSET = datetime.timedelta(hours=9)
 
-RSS_URL = "https://news.yahoo.co.jp/rss/topics/top-picks.xml"
+# 改用 Yahoo 评论排行榜 RSS (热度最高)
+RSS_URL = "https://news.yahoo.co.jp/rss/ranking/comment/all.xml"
 
 def get_current_jst_time():
     return datetime.datetime.utcnow() + JST_OFFSET
 
 def update_news():
-    print("🚀 开始抓取 Yahoo Japan RSS...")
+    print("🚀 开始抓取 Yahoo 评论排行榜...")
     try:
         feed = feedparser.parse(RSS_URL)
     except Exception as e:
@@ -24,60 +24,86 @@ def update_news():
 
     translator = GoogleTranslator(source='auto', target='zh-CN')
     
-    news_data = []
+    # 1. 读取今日已有的存档（为了去重）
+    archive_dir = "archive"
+    if not os.path.exists(archive_dir):
+        os.makedirs(archive_dir)
+        
+    date_str = get_current_jst_time().strftime("%Y-%m-%d")
+    archive_path = os.path.join(archive_dir, f"{date_str}.json")
     
-    # 抓取前 15 条
-    for entry in feed.entries[:15]:
+    existing_links = set()
+    current_archive_data = []
+
+    # 如果今天已经有存档，先读出来
+    if os.path.exists(archive_path):
         try:
-            # 翻译标题
+            with open(archive_path, 'r', encoding='utf-8') as f:
+                current_archive_data = json.load(f)
+                for item in current_archive_data:
+                    existing_links.add(item['link'])
+        except:
+            print("⚠️ 读取旧存档失败，将创建新存档")
+
+    # 2. 处理新抓取的数据
+    new_items_count = 0
+    
+    # 我们只看 RSS 的前 15 条（热度最高的）
+    for entry in feed.entries[:15]:
+        link = entry.link
+        
+        # 去重：如果这个链接今天已经存过了，就跳过
+        if link in existing_links:
+            continue
+
+        try:
             zh_title = translator.translate(entry.title)
         except:
             zh_title = entry.title
         
-        # 提取发布时间 (尝试解析 RSS 的时间，如果失败则用当前时间)
-        try:
-            if hasattr(entry, 'published_parsed') and entry.published_parsed:
-                # 转换为 JST 时间显示
-                published_utc = datetime.datetime(*entry.published_parsed[:6])
-                published_jst = published_utc # Yahoo RSS通常已经是时区调整过的，或者我们只取时分
-                time_str = published_jst.strftime("%H:%M")
-            else:
-                time_str = get_current_jst_time().strftime("%H:%M")
-        except:
-            time_str = get_current_jst_time().strftime("%H:%M")
+        # 尝试提取图片 (Yahoo RSS 格式不定，尝试几种常见字段)
+        image_url = ""
+        # 1. 尝试 media_thumbnail
+        if 'media_thumbnail' in entry and len(entry.media_thumbnail) > 0:
+            image_url = entry.media_thumbnail[0]['url']
+        # 2. 尝试 links 中的 image 类型
+        elif 'links' in entry:
+            for l in entry.links:
+                if 'image' in l.get('type', ''):
+                    image_url = l['href']
+                    break
+        
+        # 获取时间
+        time_str = get_current_jst_time().strftime("%H:%M")
 
-        news_data.append({
+        item_data = {
             "title": zh_title,
             "origin": entry.title,
-            "link": entry.link,
-            "time": time_str
-        })
-        # 稍微暂停防封
+            "link": link,
+            "time": time_str,
+            "image": image_url  # 新增图片字段
+        }
+        
+        # 添加到列表头部（最新的排前面）
+        current_archive_data.insert(0, item_data)
+        existing_links.add(link)
+        new_items_count += 1
+        
+        # 稍微延时
         time.sleep(0.5)
 
-    if not news_data:
-        print("⚠️ 未获取到任何新闻数据")
-        return
+    print(f"✅ 新增了 {new_items_count} 条新闻")
 
-    # --- 1. 保存今日最新数据 (供首页默认显示) ---
-    with open('data.json', 'w', encoding='utf-8') as f:
-        json.dump(news_data, f, ensure_ascii=False, indent=2)
-    print("✅ data.json 更新成功")
-
-    # --- 2. 保存历史存档 (archive/YYYY-MM-DD.json) ---
-    # 确保 archive 文件夹存在
-    archive_dir = "archive"
-    if not os.path.exists(archive_dir):
-        os.makedirs(archive_dir)
-    
-    # 获取日本时间的日期字符串 (例如 2023-11-28)
-    date_str = get_current_jst_time().strftime("%Y-%m-%d")
-    archive_path = os.path.join(archive_dir, f"{date_str}.json")
-
-    # 写入存档
+    # 3. 保存今日存档 (包含之前和新增的)
     with open(archive_path, 'w', encoding='utf-8') as f:
-        json.dump(news_data, f, ensure_ascii=False, indent=2)
+        json.dump(current_archive_data, f, ensure_ascii=False, indent=2)
     print(f"✅ 历史存档已更新: {archive_path}")
+
+    # 4. 更新首页 data.json (只显示存档里最新的 20 条，保持首页精简)
+    # 首页数据直接用今天的存档即可
+    with open('data.json', 'w', encoding='utf-8') as f:
+        json.dump(current_archive_data[:20], f, ensure_ascii=False, indent=2)
+    print("✅ data.json 更新成功")
 
 if __name__ == "__main__":
     update_news()

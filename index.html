@@ -8,306 +8,285 @@
     <link rel="apple-touch-icon" href="icon.png">
     <style>
         /* --- 基础设置 --- */
-        body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Roboto, Arial, sans-serif; background-color: #F2F2F7; color: #1C1C1E; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; padding-bottom: 50px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Roboto, Arial, sans-serif; background-color: #F2F2F7; color: #1C1C1E; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; padding-bottom: 80px; }
         
-        /* 顶部 Header */
+        /* 安装引导条 */
+        #install-banner {
+            display: none;
+            background: #333;
+            color: white;
+            padding: 10px 15px;
+            font-size: 13px;
+            position: relative;
+            align-items: center;
+            justify-content: space-between;
+        }
+        #install-close { font-size: 18px; padding: 0 10px; cursor: pointer; color: #aaa; }
+        
+        /* Header */
         .header { background: rgba(255, 255, 255, 0.96); padding: 12px 0; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #C6C6C8; text-align: center; backdrop-filter: blur(20px); }
         .header h1 { margin: 0; font-size: 20px; font-weight: 900; font-family: "Times New Roman", serif; letter-spacing: 0.5px; }
         .header p { margin: 2px 0 0 0; font-size: 10px; color: #8E8E93; text-transform: uppercase; letter-spacing: 1px; }
         
         .container { padding: 16px; max-width: 500px; margin: 0 auto; }
         
-        /* 日历样式 */
-        .calendar-card { background: white; border-radius: 14px; padding: 16px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: all 0.3s ease; }
-        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px; }
-        .cal-month-title { font-size: 16px; font-weight: 700; color: #000; }
-        #date-picker-input { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
-        .cal-picker-btn { font-size: 20px; color: #007AFF; cursor: pointer; width: 30px; height: 30px; display: flex; align-items: center; justify-content: flex-end; }
-        .calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; margin-bottom: 8px; }
-        .cal-weekday { font-size: 11px; color: #8E8E93; font-weight: 600; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 8px; text-align: center; overflow: hidden; }
-        .cal-date { height: 36px; line-height: 36px; font-size: 15px; border-radius: 50%; cursor: pointer; position: relative; margin: 0 auto; width: 36px; }
+        /* 日历样式 (保持不变) */
+        .calendar-card { background: white; border-radius: 14px; padding: 16px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .cal-month-title { font-size: 16px; font-weight: 700; }
+        #date-picker-input { position: absolute; opacity: 0; width: 0; height: 0; }
+        .cal-picker-btn { font-size: 20px; color: #007AFF; cursor: pointer; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 8px; text-align: center; }
+        .cal-date { height: 36px; line-height: 36px; font-size: 15px; border-radius: 50%; cursor: pointer; margin: 0 auto; width: 36px; }
         .cal-date.active { background-color: #000; color: white; font-weight: 600; }
         .cal-date.today { border: 1px solid #007AFF; color: #007AFF; }
-        .cal-date.active.today { background-color: #007AFF; color: white; border: none; }
-        .cal-date.other-month { color: #D1D1D6; }
-        .calendar-toggle { text-align: center; margin-top: 8px; padding-top: 8px; border-top: 1px solid #F2F2F7; color: #C7C7CC; cursor: pointer; font-size: 12px; }
-        
-        /* 列表样式 */
+        .calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; margin-bottom: 8px; font-size: 11px; color: #8E8E93; }
+
         .section-header { display: flex; align-items: center; font-size: 13px; font-weight: 600; color: #3C3C43; margin-bottom: 12px; padding-left: 4px; }
         .section-header::before { content: ''; width: 4px; height: 14px; background: #FF3B30; margin-right: 8px; border-radius: 2px; }
-        .card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.02); transition: background 0.2s; }
-        .card:active { background: #E5E5EA; }
-        .card-time { font-size: 11px; color: #FF3B30; font-weight: 700; margin-bottom: 6px; display: inline-block; }
-        .card-title { font-size: 17px; font-weight: 700; line-height: 1.45; color: #000; margin-bottom: 8px; }
-        .card-origin { font-size: 12px; color: #8E8E93; margin-bottom: 12px; }
-        .card-link { font-size: 13px; color: #007AFF; text-decoration: none; font-weight: 500; }
+
+        /* 新闻卡片 (带图版) */
+        .card { background: white; border-radius: 12px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); transition: transform 0.1s; display: flex; flex-direction: column; }
+        .card:active { transform: scale(0.98); }
         
-        /* --- 弹窗模态框样式 (新增) --- */
-        #fallback-modal {
-            display: none; /* 默认隐藏 */
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); /* 半透明黑色背景 */
-            z-index: 2000;
-            backdrop-filter: blur(5px);
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.2s ease;
-        }
-
-        #modal-content {
-            background: #F2F2F7;
-            width: 85%;
-            max-width: 400px;
-            max-height: 70vh; /* 最大高度为屏幕70% */
-            border-radius: 16px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .modal-header {
-            background: white;
-            padding: 15px;
-            text-align: center;
-            border-bottom: 1px solid #E5E5EA;
-        }
-        .modal-header h3 { margin: 0; font-size: 16px; font-weight: bold; }
-        .modal-header p { margin: 4px 0 0 0; font-size: 12px; color: #8E8E93; }
-
-        .modal-body {
-            padding: 15px;
-            overflow-y: auto; /* 内容过多可滚动 */
-        }
-
-        /* 弹窗内的卡片稍微小一点 */
-        .modal-body .card {
-            padding: 12px;
-            margin-bottom: 10px;
-        }
-        .modal-body .card-title { font-size: 15px; }
-
-        /* 动画关键帧 */
+        /* 图片区域 */
+        .card-img { width: 100%; height: 160px; object-fit: cover; display: none; background: #eee; }
+        .card-img.show { display: block; }
+        
+        .card-body { padding: 15px; }
+        .card-time { font-size: 11px; color: #FF3B30; font-weight: 700; margin-bottom: 6px; display: inline-block; background: rgba(255,59,48,0.08); padding: 2px 6px; border-radius: 4px; }
+        .card-title { font-size: 17px; font-weight: 700; line-height: 1.4; color: #000; margin-bottom: 6px; }
+        .card-origin { font-size: 12px; color: #8E8E93; }
+        
+        /* 弹窗样式 */
+        #news-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; backdrop-filter: blur(5px); align-items: center; justify-content: center; animation: fadeIn 0.2s; }
+        .modal-content { background: white; width: 85%; max-width: 400px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.2); animation: slideUp 0.3s; }
+        .modal-img { width: 100%; height: 200px; object-fit: cover; background: #eee; display: none; }
+        .modal-body { padding: 20px; }
+        .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; line-height: 1.4; }
+        .modal-origin-title { font-size: 14px; color: #888; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .modal-btn { display: block; width: 100%; background: #007AFF; color: white; text-align: center; padding: 12px 0; border-radius: 10px; text-decoration: none; font-weight: 600; margin-top: 10px; }
+        
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* 微信遮罩 */
+        /* 微信提示 */
         #wx-mask { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; color: white; text-align: right; padding: 20px; }
     </style>
 </head>
 <body>
+    
+    <!-- 微信拦截 -->
     <div id="wx-mask" onclick="this.style.display='none'">
         <div style="font-size: 40px; margin-right: 15px;">↗</div>
-        <p style="font-size: 18px; font-weight: bold; margin-right: 15px;">请在浏览器打开</p>
+        <p style="font-size: 18px; font-weight: bold; margin-right: 15px;">请点击右上角 ...</p>
+        <p style="font-size: 16px; margin-right: 15px;">选择在浏览器打开</p>
     </div>
 
-    <!-- 弹窗模态框 -->
-    <div id="fallback-modal">
-        <div id="modal-content">
-            <div class="modal-header">
-                <h3>该日期暂无存档</h3>
-                <p>为您推荐今日热门新闻</p>
-            </div>
-            <div class="modal-body" id="modal-news-list">
-                <!-- JS 动态填入今日新闻 -->
-                <p style="text-align:center; padding:20px; color:#999;">加载中...</p>
-            </div>
-        </div>
+    <!-- PWA 安装引导 -->
+    <div id="install-banner">
+        <span id="install-text">添加到主屏幕，获取最佳体验</span>
+        <span id="install-close">×</span>
     </div>
 
     <div class="header">
         <h1>THE JAPAN TIMES</h1>
-        <p>Real-time & Archive</p>
+        <p>Ranking & Archive</p>
     </div>
 
     <div class="container">
+        <!-- 日历 -->
         <div class="calendar-card">
             <div class="calendar-header">
                 <span class="cal-month-title" id="cal-month-display">...</span>
-                <div class="cal-picker-btn" onclick="openDatePicker()">📅</div>
+                <div class="cal-picker-btn" onclick="document.getElementById('date-picker-input').showPicker()">📅</div>
                 <input type="date" id="date-picker-input" onchange="handleDatePick(this.value)">
             </div>
             <div class="calendar-weekdays">
-                <div class="cal-weekday">日</div><div class="cal-weekday">一</div><div class="cal-weekday">二</div>
-                <div class="cal-weekday">三</div><div class="cal-weekday">四</div><div class="cal-weekday">五</div>
-                <div class="cal-weekday">六</div>
+                <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
             </div>
             <div class="calendar-grid" id="calendar-grid"></div>
-            <div class="calendar-toggle" id="cal-toggle-btn" onclick="toggleCalendar()">展开全部 ▼</div>
         </div>
 
-        <div class="section-header" id="news-section-title">加载中...</div>
+        <div class="section-header" id="news-section-title">今日热榜</div>
         <div id="news-list"></div>
     </div>
 
+    <!-- 新闻详情弹窗 -->
+    <div id="news-modal" onclick="closeModal(event)">
+        <div class="modal-content">
+            <img src="" class="modal-img" id="m-img">
+            <div class="modal-body">
+                <div class="modal-title" id="m-title"></div>
+                <div class="modal-origin-title" id="m-origin"></div>
+                <a href="#" target="_blank" class="modal-btn" id="m-btn">阅读原文 (Yahoo! JAPAN)</a>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // --- 状态变量 ---
         let currentDate = new Date();
-        let isExpanded = false; 
 
-        // --- 初始化 ---
         function init() {
-            // 点击模态框背景关闭逻辑
-            const modal = document.getElementById('fallback-modal');
-            modal.onclick = function(e) {
-                // 如果点击的是背景(modal本身)，而不是里面的内容(modal-content)，则关闭
-                if (e.target === modal) {
-                    modal.style.display = 'none';
-                }
-            }
-
+            // 微信检测
             if (/MicroMessenger/i.test(navigator.userAgent)) {
                 document.getElementById('wx-mask').style.display = 'block';
             }
-
+            // PWA 检测
+            checkPWA();
+            // 初始化日历和数据
             renderCalendar(currentDate);
             loadNewsByDate(currentDate);
-
-            const isoToday = new Date().toISOString().split('T')[0];
-            document.getElementById('date-picker-input').max = isoToday;
+            
+            // 日期选择器最大选今天
+            document.getElementById('date-picker-input').max = new Date().toISOString().split('T')[0];
+            
+            // 关闭 banner
+            document.getElementById('install-close').onclick = function() {
+                document.getElementById('install-banner').style.display = 'none';
+            }
         }
 
-        // --- 核心逻辑：加载数据 ---
+        function checkPWA() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+            
+            if (!isStandalone) {
+                const banner = document.getElementById('install-banner');
+                const text = document.getElementById('install-text');
+                if (isIOS) {
+                    banner.style.display = 'flex';
+                    text.innerText = "点击底部分享按钮，选择“添加到主屏幕” 📲";
+                } else {
+                    // 安卓通常会自动弹窗，也可以显示提示
+                    // banner.style.display = 'flex'; 
+                }
+            }
+        }
+
         function loadNewsByDate(dateObj) {
             const container = document.getElementById('news-list');
             const title = document.getElementById('news-section-title');
-            
-            // 格式化日期 YYYY-MM-DD
+            container.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">加载中...</p>';
+
             const y = dateObj.getFullYear();
             const m = String(dateObj.getMonth() + 1).padStart(2, '0');
             const d = String(dateObj.getDate()).padStart(2, '0');
             const dateStr = `${y}-${m}-${d}`;
+            const isToday = (dateObj.toDateString() === new Date().toDateString());
 
-            const today = new Date();
-            const isToday = (dateObj.getDate() === today.getDate() && 
-                             dateObj.getMonth() === today.getMonth() && 
-                             dateObj.getFullYear() === today.getFullYear());
-
-            let url = '';
-            // 显示 Loading
-            container.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">正在读取数据...</p>';
-
-            if (isToday) {
-                title.innerText = `今日热点 (${m}月${d}日)`;
-                url = `data.json?t=${new Date().getTime()}`;
-            } else {
-                title.innerText = `${m}月${d}日 存档`;
-                url = `archive/${dateStr}.json`;
-            }
+            let url = isToday ? `data.json?t=${Date.now()}` : `archive/${dateStr}.json`;
+            
+            if (isToday) title.innerText = "今日热榜 (按热度)";
+            else title.innerText = `${m}月${d}日 存档`;
 
             fetch(url)
-                .then(response => {
-                    if (!response.ok) throw new Error("Not Found");
-                    return response.json();
+                .then(res => {
+                    if(!res.ok) throw new Error("No Data");
+                    return res.json();
                 })
-                .then(data => {
-                    renderNews(data, container); // 正常渲染到主列表
-                })
+                .then(data => renderNews(data))
                 .catch(err => {
-                    console.log("存档不存在，触发弹窗逻辑");
-                    container.innerHTML = '<div style="text-align:center; padding: 40px; color:#ccc; font-size:14px;">📅 该日期暂无存档</div>';
-                    // 触发弹窗显示今日热点
-                    showFallbackModal();
+                    container.innerHTML = '<div style="text-align:center;padding:30px;color:#ccc;">📅 该日期暂无存档</div>';
                 });
         }
 
-        // --- 弹窗逻辑 ---
-        function showFallbackModal() {
-            const modal = document.getElementById('fallback-modal');
-            const modalContainer = document.getElementById('modal-news-list');
-            
-            modal.style.display = 'flex'; // 显示弹窗
-            
-            // 获取今日数据 (data.json)
-            fetch(`data.json?t=${new Date().getTime()}`)
-                .then(res => res.json())
-                .then(data => {
-                    // 只取前 10 条
-                    const top10 = data.slice(0, 10);
-                    renderNews(top10, modalContainer);
-                })
-                .catch(err => {
-                    modalContainer.innerHTML = '<p style="text-align:center; color:#999;">无法获取热门推荐</p>';
-                });
-        }
-
-        // --- 渲染新闻 (通用函数) ---
-        function renderNews(list, targetElement) {
-            if (!list || list.length === 0) {
-                targetElement.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">无数据</div>';
+        function renderNews(list) {
+            const container = document.getElementById('news-list');
+            if(!list || list.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:30px;color:#ccc;">暂无数据</div>';
                 return;
             }
             let html = '';
-            list.forEach(item => {
+            list.forEach((item, index) => {
+                // 检查是否有图
+                const imgClass = item.image ? 'card-img show' : 'card-img';
+                // 只有前3名显示红色热度，其他的灰色
+                const timeColor = index < 3 ? '#FF3B30' : '#8E8E93';
+                const timeBg = index < 3 ? 'rgba(255,59,48,0.1)' : '#F2F2F7';
+                
+                // 将数据转义后存入 onclick (简单防错)
+                const safeItem = encodeURIComponent(JSON.stringify(item));
+
                 html += `
-                <div class="card" onclick="window.open('${item.link}', '_blank')">
-                    <span class="card-time">${item.time}</span>
-                    <div class="card-title">${item.title}</div>
-                    <div class="card-origin">原文: ${item.origin}</div>
-                    <a href="${item.link}" class="card-link">阅读原文 →</a>
+                <div class="card" onclick="openModal('${safeItem}')">
+                    <img src="${item.image || ''}" class="${imgClass}">
+                    <div class="card-body">
+                        <span class="card-time" style="color:${timeColor};background:${timeBg}">
+                            ${index < 3 ? '🔥 热度 Top ' + (index + 1) : item.time}
+                        </span>
+                        <div class="card-title">${item.title}</div>
+                        <div class="card-origin">${item.origin}</div>
+                    </div>
                 </div>`;
             });
-            targetElement.innerHTML = html;
+            container.innerHTML = html;
         }
 
-        // --- 渲染日历 (复用) ---
+        // --- 弹窗逻辑 ---
+        function openModal(itemStr) {
+            const item = JSON.parse(decodeURIComponent(itemStr));
+            const modal = document.getElementById('news-modal');
+            const img = document.getElementById('m-img');
+            
+            document.getElementById('m-title').innerText = item.title;
+            document.getElementById('m-origin').innerText = "原文: " + item.origin;
+            document.getElementById('m-btn').href = item.link;
+            
+            if (item.image) {
+                img.src = item.image;
+                img.style.display = 'block';
+            } else {
+                img.style.display = 'none';
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeModal(e) {
+            if (e.target.id === 'news-modal') {
+                document.getElementById('news-modal').style.display = 'none';
+            }
+        }
+
+        // --- 日历渲染 (简化版) ---
         function renderCalendar(baseDate) {
             const grid = document.getElementById('calendar-grid');
-            const monthDisplay = document.getElementById('cal-month-display');
-            const year = baseDate.getFullYear();
-            const month = baseDate.getMonth();
-            const today = new Date();
-
-            monthDisplay.innerText = `${year}年 ${month + 1}月`;
+            document.getElementById('cal-month-display').innerText = `${baseDate.getFullYear()}年 ${baseDate.getMonth()+1}月`;
+            
+            // 简单只显示本周 (为了UI不崩坏，这里简化逻辑，始终显示选中日期所在周)
             grid.innerHTML = '';
+            
+            const currentDay = baseDate.getDay(); 
+            const startDate = new Date(baseDate);
+            startDate.setDate(baseDate.getDate() - currentDay); // 这一周的周日
 
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            let datesHtml = [];
-
-            for (let i = 0; i < firstDay; i++) datesHtml.push(`<div class="cal-date other-month"></div>`);
-
-            for (let i = 1; i <= daysInMonth; i++) {
-                const isSelected = (i === baseDate.getDate());
-                const isToday = (i === today.getDate() && month === today.getMonth() && year === today.getFullYear());
-                let classes = 'cal-date';
-                if (isSelected) classes += ' active';
-                if (isToday) classes += ' today';
-                datesHtml.push(`<div class="${classes}" onclick="selectDate(${year}, ${month}, ${i})">${i}</div>`);
+            for(let i=0; i<7; i++) {
+                let d = new Date(startDate);
+                d.setDate(startDate.getDate() + i);
+                
+                const el = document.createElement('div');
+                el.className = 'cal-date';
+                el.innerText = d.getDate();
+                
+                if(d.toDateString() === baseDate.toDateString()) el.classList.add('active');
+                if(d.toDateString() === new Date().toDateString()) el.classList.add('today');
+                
+                el.onclick = () => {
+                    renderCalendar(d);
+                    loadNewsByDate(d);
+                    currentDate = d;
+                };
+                grid.appendChild(el);
             }
-
-            if (!isExpanded) {
-                const selectedIndex = firstDay + baseDate.getDate() - 1;
-                const weekStart = Math.floor(selectedIndex / 7) * 7;
-                datesHtml = datesHtml.slice(weekStart, weekStart + 7);
-                document.getElementById('cal-toggle-btn').innerText = "展开全部 ▼";
-            } else {
-                document.getElementById('cal-toggle-btn').innerText = "收起日历 ▲";
-            }
-            grid.innerHTML = datesHtml.join('');
         }
-
-        function selectDate(y, m, d) {
-            currentDate = new Date(y, m, d);
-            renderCalendar(currentDate);
-            loadNewsByDate(currentDate);
-        }
-
-        function toggleCalendar() {
-            isExpanded = !isExpanded;
-            renderCalendar(currentDate);
-        }
-
-        function openDatePicker() { document.getElementById('date-picker-input').showPicker(); }
         
-        function handleDatePick(dateStr) {
-            if (!dateStr) return;
-            const parts = dateStr.split('-');
-            selectDate(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        function handleDatePick(val) {
+            if(!val) return;
+            const d = new Date(val);
+            renderCalendar(d);
+            loadNewsByDate(d);
+            currentDate = d;
         }
 
         init();
