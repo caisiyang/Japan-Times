@@ -10,7 +10,6 @@
         /* --- 基础设置 --- */
         body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Roboto, Arial, sans-serif; background-color: #F2F2F7; color: #1C1C1E; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; padding-bottom: 80px; }
         
-        /* 安装引导条 */
         #install-banner { display: none; background: #333; color: white; padding: 10px 15px; font-size: 13px; align-items: center; justify-content: space-between; }
         #install-close { font-size: 18px; padding: 0 10px; cursor: pointer; color: #aaa; }
         
@@ -21,42 +20,14 @@
         
         .container { padding: 16px; max-width: 500px; margin: 0 auto; }
 
-        /* --- 新增：折叠公告栏 --- */
-        .notice-card {
-            background-color: #E3F2FD; /* 淡蓝色背景 */
-            border-radius: 10px;
-            padding: 10px 14px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            color: #0D47A1;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid rgba(13, 71, 161, 0.1);
-        }
-        .notice-card:active { background-color: #BBDEFB; }
-        .notice-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-        }
-        .notice-icon { margin-right: 6px; }
+        /* 公告栏 */
+        .notice-card { background-color: #E3F2FD; border-radius: 10px; padding: 10px 14px; margin-bottom: 20px; font-size: 13px; color: #0D47A1; cursor: pointer; border: 1px solid rgba(13, 71, 161, 0.1); }
+        .notice-header { display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
         .notice-arrow { font-size: 10px; opacity: 0.6; transition: transform 0.3s; }
         .notice-arrow.rotate { transform: rotate(180deg); }
-        
-        /* 详情部分 (默认隐藏) */
-        .notice-details {
-            display: none;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid rgba(13, 71, 161, 0.1);
-            color: #1565C0;
-            line-height: 1.6;
-        }
-        .notice-details p { margin: 0 0 8px 0; }
-        .notice-details p:last-child { margin: 0; }
-        
-        /* 日历样式 */
+        .notice-details { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(13, 71, 161, 0.1); color: #1565C0; line-height: 1.6; }
+
+        /* 日历 */
         .calendar-card { background: white; border-radius: 14px; padding: 16px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .cal-month-title { font-size: 16px; font-weight: 700; }
@@ -68,24 +39,22 @@
         .cal-date.today { border: 1px solid #007AFF; color: #007AFF; }
         .calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; margin-bottom: 8px; font-size: 11px; color: #8E8E93; }
 
-        /* 分段控制器 */
-        .segmented-control { display: flex; background: #E5E5EA; border-radius: 9px; padding: 2px; margin-bottom: 20px; }
-        .segment-btn { flex: 1; text-align: center; padding: 8px 0; font-size: 13px; font-weight: 600; color: #8E8E93; cursor: pointer; border-radius: 7px; transition: all 0.2s; }
-        .segment-btn.active { background: white; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        /* 排序控制条 */
+        .sort-control { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; }
+        .sort-btn { font-size: 12px; padding: 4px 10px; border-radius: 12px; background: #E5E5EA; color: #8E8E93; cursor: pointer; margin-left: 8px; font-weight: 500; }
+        .sort-btn.active { background: #000; color: white; }
 
-        /* 新闻列表 */
-        .news-list-container { display: none; }
-        .news-list-container.active { display: block; animation: fadeIn 0.3s; }
+        .section-header { display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 600; color: #3C3C43; margin-bottom: 12px; padding-left: 4px; }
+        .section-title-left { display: flex; align-items: center; }
+        .section-title-left::before { content: ''; width: 4px; height: 14px; background: #FF3B30; margin-right: 8px; border-radius: 2px; }
 
-        .section-header { display: flex; align-items: center; font-size: 13px; font-weight: 600; color: #3C3C43; margin-bottom: 12px; padding-left: 4px; }
-        .section-header::before { content: ''; width: 4px; height: 14px; background: #FF3B30; margin-right: 8px; border-radius: 2px; }
-
+        /* 卡片 */
         .card { background: white; border-radius: 12px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); transition: transform 0.1s; display: flex; flex-direction: column; }
         .card:active { transform: scale(0.98); }
         .card-img { width: 100%; height: 160px; object-fit: cover; background: #f0f0f0; display: none; } 
         .card-img.show { display: block; }
         .card-body { padding: 15px; }
-        .card-time { font-size: 11px; color: #FF3B30; font-weight: 700; margin-bottom: 6px; display: inline-block; background: rgba(255,59,48,0.08); padding: 2px 6px; border-radius: 4px; }
+        .card-time { font-size: 11px; color: #8E8E93; font-weight: 600; margin-bottom: 6px; display: inline-block; background: #F2F2F7; padding: 2px 6px; border-radius: 4px; }
         .card-title { font-size: 17px; font-weight: 700; line-height: 1.4; color: #000; margin-bottom: 6px; }
         .card-origin { font-size: 12px; color: #8E8E93; }
         
@@ -97,41 +66,26 @@
         .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; line-height: 1.4; }
         .modal-origin-title { font-size: 14px; color: #888; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
         .modal-btn { display: block; width: 100%; background: #007AFF; color: white; text-align: center; padding: 12px 0; border-radius: 10px; text-decoration: none; font-weight: 600; }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         #wx-mask { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; color: white; text-align: right; padding: 20px; }
     </style>
 </head>
 <body>
-    
-    <div id="wx-mask" onclick="this.style.display='none'">
-        <div style="font-size: 40px; margin-right: 15px;">↗</div>
-        <p style="font-size: 18px; font-weight: bold; margin-right: 15px;">请点击右上角 ...</p>
-        <p style="font-size: 16px; margin-right: 15px;">选择在浏览器打开</p>
-    </div>
-
-    <div id="install-banner">
-        <span id="install-text">添加到主屏幕，获取最佳体验</span>
-        <span id="install-close">×</span>
-    </div>
+    <div id="wx-mask" onclick="this.style.display='none'"><div style="font-size: 40px; margin-right: 15px;">↗</div><p style="font-size: 18px; font-weight: bold; margin-right: 15px;">请点击右上角 ...</p><p style="font-size: 16px; margin-right: 15px;">选择在浏览器打开</p></div>
+    <div id="install-banner"><span id="install-text">添加到主屏幕，获取最佳体验</span><span id="install-close">×</span></div>
 
     <div class="header">
         <h1>THE JAPAN TIMES</h1>
-        <p>Ranking & China Focus</p>
+        <p>Focus on China</p>
     </div>
 
     <div class="container">
-        
-        <!-- 网站公告栏 -->
+        <!-- 公告栏 -->
         <div class="notice-card" onclick="toggleNotice()">
-            <div class="notice-header">
-                <div><span class="notice-icon">ℹ️</span> 来自作者</div>
-                <div class="notice-arrow" id="n-arrow">▼</div>
-            </div>
+            <div class="notice-header"><div><span class="notice-icon">ℹ️</span> 关于本站</div><div class="notice-arrow" id="n-arrow">▼</div></div>
             <div class="notice-details" id="n-details">
-                <p>本网站由日本华人<b>中本蔡</b>制作，目的是让全世界华人都能看到真实的日本当地热点新闻。从 <b>2025年11月27日</b> 开始，系统每小时会自动抓取一次日本实时热门新闻和与中国有关的报道，手机用户请添加到主屏幕方便快速查看。</p>
-                <p style="font-size:12px; opacity:0.8;">*由于技术限制，无法查看建站之前的历史数据，敬请谅解。</p>
+                <p>本站由日本华人<b>中本蔡</b>制作，专注聚合<b>日本媒体眼中的中国新闻</b>。首页实时展示<b>近7天</b>的报道，超过7天的历史新闻请通过日历查看。</p>
+                <p style="font-size:12px; opacity:0.8;">*每小时自动抓取，数据源为 Google News 日本版。</p>
             </div>
         </div>
 
@@ -146,22 +100,16 @@
             <div class="calendar-grid" id="calendar-grid"></div>
         </div>
 
-        <!-- 切换 Tab -->
-        <div class="segmented-control">
-            <div class="segment-btn active" onclick="switchTab('hot')" id="tab-hot">🇯🇵 日本热搜</div>
-            <div class="segment-btn" onclick="switchTab('china')" id="tab-china">🇨🇳 中国相关</div>
+        <!-- 标题 + 排序按钮 -->
+        <div class="section-header">
+            <div class="section-title-left" id="list-title">近7天新闻</div>
+            <div class="sort-control" id="sort-control" style="display:none;">
+                <div class="sort-btn active" onclick="sortNews('default')" id="btn-default">🔥 按热度</div>
+                <div class="sort-btn" onclick="sortNews('time')" id="btn-time">🕒 按时间</div>
+            </div>
         </div>
 
-        <div class="section-header" id="list-title">今日更新</div>
-
-        <!-- 两个列表容器 -->
-        <div id="list-hot" class="news-list-container active">
-            <!-- 渲染 JS -->
-        </div>
-        <div id="list-china" class="news-list-container">
-            <!-- 渲染 JS -->
-        </div>
-
+        <div id="news-list"></div>
     </div>
 
     <div id="news-modal" onclick="closeModal(event)">
@@ -177,7 +125,7 @@
 
     <script>
         let currentDate = new Date();
-        let currentData = { hot: [], china: [] }; 
+        let rawNewsData = []; // 存储当前列表的原始数据
 
         function init() {
             if (/MicroMessenger/i.test(navigator.userAgent)) document.getElementById('wx-mask').style.display = 'block';
@@ -188,17 +136,11 @@
             document.getElementById('install-close').onclick = () => document.getElementById('install-banner').style.display = 'none';
         }
 
-        // --- 新增：切换公告折叠 ---
         function toggleNotice() {
-            const details = document.getElementById('n-details');
-            const arrow = document.getElementById('n-arrow');
-            if (details.style.display === 'block') {
-                details.style.display = 'none';
-                arrow.classList.remove('rotate');
-            } else {
-                details.style.display = 'block';
-                arrow.classList.add('rotate');
-            }
+            const d = document.getElementById('n-details');
+            const a = document.getElementById('n-arrow');
+            d.style.display = d.style.display==='block'?'none':'block';
+            d.style.display==='block'?a.classList.add('rotate'):a.classList.remove('rotate');
         }
 
         function checkPWA() {
@@ -210,19 +152,12 @@
             }
         }
 
-        function switchTab(type) {
-            document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab-' + type).classList.add('active');
-            document.querySelectorAll('.news-list-container').forEach(c => c.classList.remove('active'));
-            document.getElementById('list-' + type).classList.add('active');
-        }
-
         function loadNewsByDate(dateObj) {
-            const hotList = document.getElementById('list-hot');
-            const chinaList = document.getElementById('list-china');
+            const container = document.getElementById('news-list');
             const title = document.getElementById('list-title');
+            const sortCtrl = document.getElementById('sort-control');
             
-            hotList.innerHTML = chinaList.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">加载中...</p>';
+            container.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">加载中...</p>';
 
             const y = dateObj.getFullYear();
             const m = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -230,10 +165,16 @@
             const dateStr = `${y}-${m}-${d}`;
             const isToday = (dateObj.toDateString() === new Date().toDateString());
 
+            // 首页读取 data.json (含7天)，历史读取 archive
             let url = isToday ? `data.json?t=${Date.now()}` : `archive/${dateStr}.json`;
             
-            if (!isToday) title.innerText = `${m}月${d}日 存档`;
-            else title.innerText = "实时更新";
+            if (isToday) {
+                title.innerText = "近7天新闻";
+                sortCtrl.style.display = 'flex'; // 只有首页支持排序
+            } else {
+                title.innerText = `${m}月${d}日 存档`;
+                sortCtrl.style.display = 'none'; // 历史存档通常只有当天的，不用排
+            }
 
             fetch(url)
                 .then(res => {
@@ -241,38 +182,58 @@
                     return res.json();
                 })
                 .then(data => {
-                    if (Array.isArray(data)) { data = { hot: data, china: [] }; }
-                    currentData = data;
-                    renderNews(data.hot, 'list-hot');
-                    renderNews(data.china, 'list-china');
+                    // 如果是旧数据结构(对象)，尝试提取china字段，如果是新结构(列表)，直接用
+                    if (!Array.isArray(data) && data.china) {
+                         rawNewsData = data.china;
+                    } else if (Array.isArray(data)) {
+                        rawNewsData = data;
+                    } else {
+                        rawNewsData = [];
+                    }
+                    
+                    // 默认按 "default" (热度/RSS顺序) 渲染
+                    sortNews('default');
                 })
                 .catch(err => {
-                    hotList.innerHTML = chinaList.innerHTML = '<div style="text-align:center;padding:30px;color:#ccc;">📅 该日期暂无存档</div>';
+                    container.innerHTML = '<div style="text-align:center;padding:30px;color:#ccc;">📅 该日期暂无存档</div>';
                 });
         }
 
-        function renderNews(list, containerId) {
-            const container = document.getElementById(containerId);
+        function sortNews(type) {
+            // 更新按钮状态
+            document.getElementById('btn-default').className = type === 'default' ? 'sort-btn active' : 'sort-btn';
+            document.getElementById('btn-time').className = type === 'time' ? 'sort-btn active' : 'sort-btn';
+
+            if (!rawNewsData || rawNewsData.length === 0) return;
+
+            let sortedData = [...rawNewsData]; // 复制一份
+
+            if (type === 'time') {
+                // 按 timestamp 倒序 (大的在前)
+                sortedData.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            } else {
+                // 默认 RSS 顺序 (Google 已按相关性排序)
+            }
+            
+            renderNews(sortedData);
+        }
+
+        function renderNews(list) {
+            const container = document.getElementById('news-list');
             if(!list || list.length === 0) {
                 container.innerHTML = '<div style="text-align:center;padding:30px;color:#ccc;">暂无相关新闻</div>';
                 return;
             }
             let html = '';
-            list.forEach((item, index) => {
+            list.forEach((item) => {
                 const imgClass = item.image ? 'card-img show' : 'card-img';
                 const safeItem = encodeURIComponent(JSON.stringify(item));
                 
-                const isHotTab = containerId === 'list-hot';
-                const showRank = isHotTab && index < 3;
-                const timeColor = showRank ? '#FF3B30' : '#8E8E93';
-                const timeBg = showRank ? 'rgba(255,59,48,0.1)' : '#F2F2F7';
-                const timeText = showRank ? '🔥 Top ' + (index + 1) : item.time;
-
                 html += `
                 <div class="card" onclick="openModal('${safeItem}')">
                     <img src="${item.image || ''}" class="${imgClass}">
                     <div class="card-body">
-                        <span class="card-time" style="color:${timeColor};background:${timeBg}">${timeText}</span>
+                        <span class="card-time">${item.time_str}</span>
                         <div class="card-title">${item.title}</div>
                         <div class="card-origin">${item.origin}</div>
                     </div>
