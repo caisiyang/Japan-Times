@@ -58,6 +58,11 @@
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
+        .header-left {
+            width: 40px;
+        }
+
+        /* Spacer or potential left icon */
         .header-title {
             text-align: center;
             flex: 1;
@@ -81,22 +86,27 @@
             font-weight: 600;
         }
 
+        /* Heart Icon - Moved to a reasonable position (right side but not edge) */
         .fav-icon-btn {
-            font-size: 20px;
+            font-size: 22px;
             cursor: pointer;
             position: relative;
+            width: 40px;
+            text-align: right;
+            color: var(--accent-color);
         }
 
         .fav-badge {
             position: absolute;
-            top: -4px;
-            right: -6px;
+            top: -2px;
+            right: -4px;
             background: var(--accent-color);
             color: white;
             font-size: 10px;
             padding: 2px 5px;
             border-radius: 10px;
             display: none;
+            border: 1px solid white;
         }
 
         .container {
@@ -158,6 +168,12 @@
             margin-bottom: 16px;
         }
 
+        .section-title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .section-title {
             font-size: 18px;
             font-weight: 700;
@@ -172,6 +188,25 @@
             background: var(--accent-color);
             border-radius: 50%;
             margin-right: 10px;
+        }
+
+        /* Back Button */
+        .back-btn {
+            display: none;
+            font-size: 12px;
+            padding: 4px 10px;
+            background: rgba(214, 64, 69, 0.1);
+            color: var(--accent-color);
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            border: none;
+            align-items: center;
+        }
+
+        .back-btn::before {
+            content: '← ';
+            margin-right: 2px;
         }
 
         .sort-group {
@@ -299,6 +334,7 @@
             color: #ddd;
             cursor: pointer;
             z-index: 10;
+            transition: color 0.2s;
         }
 
         .card-fav-btn.active {
@@ -462,13 +498,13 @@
     <div id="install-banner"><span id="install-text">添加到主屏幕，获取最佳体验</span><span id="install-close">×</span></div>
 
     <div class="header">
-        <div style="width: 24px;"></div> <!-- Spacer -->
+        <div class="header-left"></div> <!-- Spacer -->
         <div class="header-title">
             <h1>Japan Times</h1>
             <p>Focus on China</p>
         </div>
         <div class="fav-icon-btn" onclick="toggleFavView()">
-            ⭐
+            ❤️
             <span class="fav-badge" id="fav-badge">0</span>
         </div>
     </div>
@@ -491,7 +527,7 @@
         <!-- 收藏夹视图 -->
         <div id="fav-view">
             <div class="fav-header">
-                <span>⭐ 我的收藏</span>
+                <span>❤️ 我的收藏</span>
                 <span class="fav-close" onclick="toggleFavView()">关闭</span>
             </div>
             <div id="fav-list"></div>
@@ -499,7 +535,10 @@
 
         <!-- 控制栏 -->
         <div class="control-bar">
-            <div class="section-title" id="list-title">Latest News</div>
+            <div class="section-title-group">
+                <div class="section-title" id="list-title">Latest News</div>
+                <button class="back-btn" id="back-btn" onclick="filterByCategory('all')">返回</button>
+            </div>
             <div class="sort-group">
                 <button class="sort-btn active" id="btn-hot" onclick="sortNews('hot')">🔥 热度</button>
                 <button class="sort-btn" id="btn-time" onclick="sortNews('time')">🕒 最新</button>
@@ -608,7 +647,16 @@
 
         function filterByCategory(cat) {
             currentFilter = cat;
-            document.getElementById('list-title').innerText = cat === 'all' ? 'Latest News' : `${cat} News`;
+            const title = document.getElementById('list-title');
+            const backBtn = document.getElementById('back-btn');
+
+            if (cat === 'all') {
+                title.innerText = 'Latest News';
+                backBtn.style.display = 'none';
+            } else {
+                title.innerText = `${cat}`;
+                backBtn.style.display = 'flex';
+            }
             processAndRender();
         }
 
@@ -620,6 +668,8 @@
             if (index > -1) {
                 favorites.splice(index, 1);
             } else {
+                // Add new favorite, mark as unread (isRead = false)
+                item.isRead = false;
                 favorites.unshift(item);
             }
 
@@ -631,9 +681,12 @@
 
         function updateFavBadge() {
             const b = document.getElementById('fav-badge');
-            if (favorites.length > 0) {
+            // Count unread favorites
+            const unreadCount = favorites.filter(f => !f.isRead).length;
+
+            if (unreadCount > 0) {
                 b.style.display = 'block';
-                b.innerText = favorites.length;
+                b.innerText = unreadCount;
             } else {
                 b.style.display = 'none';
             }
@@ -728,13 +781,18 @@
             const favIcon = isFav ? '❤️' : '🤍';
             const category = item.category || '其他';
 
+            // Only show category tag if it's NOT '其他'
+            const catTagHtml = category !== '其他'
+                ? `<span class="tag tag-cat" onclick="event.stopPropagation(); filterByCategory('${category}')">${category}</span>`
+                : '';
+
             return `
-            <div class="card" onclick="openModal('${safeItem}')">
+            <div class="card" onclick="openModal('${safeItem}', ${isFavView})">
                 <img src="${item.image || ''}" class="${imgClass}">
                 <div class="card-body">
                     <div class="card-meta">
                         <span class="tag tag-time">${item.time_str}</span>
-                        <span class="tag tag-cat" onclick="event.stopPropagation(); filterByCategory('${category}')">${category}</span>
+                        ${catTagHtml}
                         <span class="card-origin">${item.origin.split(' - ')[0]}</span>
                     </div>
                     <div class="card-title">${item.title}</div>
@@ -743,8 +801,19 @@
             </div>`;
         }
 
-        function openModal(itemStr) {
+        function openModal(itemStr, isFavView = false) {
             const item = JSON.parse(decodeURIComponent(itemStr));
+
+            // If opening from favorites or just opening, mark as read if it is a favorite
+            const favIndex = favorites.findIndex(f => f.link === item.link);
+            if (favIndex > -1) {
+                if (favorites[favIndex].isRead !== true) {
+                    favorites[favIndex].isRead = true;
+                    localStorage.setItem('jt_favorites', JSON.stringify(favorites));
+                    updateFavBadge();
+                }
+            }
+
             const modal = document.getElementById('news-modal');
             const img = document.getElementById('m-img');
             document.getElementById('m-title').innerText = item.title;
