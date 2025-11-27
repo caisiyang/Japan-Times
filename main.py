@@ -4,11 +4,11 @@ import json
 import os
 import datetime
 import time
+import requests  # 引入 requests 库来做伪装
 
 # 设置时区 UTC+9
 JST_OFFSET = datetime.timedelta(hours=9)
 
-# 改用 Yahoo 评论排行榜 RSS (热度最高)
 RSS_URL = "https://news.yahoo.co.jp/rss/ranking/comment/all.xml"
 
 def get_current_jst_time():
@@ -16,15 +16,36 @@ def get_current_jst_time():
 
 def update_news():
     print("🚀 开始抓取 Yahoo 评论排行榜...")
+    
+    # --- 🔥 核心修改：伪装成浏览器 ---
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    }
+    
     try:
-        feed = feedparser.parse(RSS_URL)
+        # 先用 requests 带着伪装头去请求
+        response = requests.get(RSS_URL, headers=headers, timeout=10)
+        # 打印状态码，方便调试 (200表示成功，403表示被拒)
+        print(f"📡 Yahoo 响应状态码: {response.status_code}")
+        
+        if response.status_code != 200:
+            print("❌ 访问被拒绝，可能IP被封锁")
+            return
+
+        # 把请求到的内容喂给 feedparser
+        feed = feedparser.parse(response.content)
+        
     except Exception as e:
-        print(f"❌ RSS抓取失败: {e}")
+        print(f"❌ 网络请求失败: {e}")
+        return
+    # ----------------------------------
+
+    if not feed.entries:
+        print("⚠️ 获取到的 RSS 内容为空，请检查网络或源")
         return
 
     translator = GoogleTranslator(source='auto', target='zh-CN')
     
-    # 1. 读取今日已有的存档（为了去重）
     archive_dir = "archive"
     if not os.path.exists(archive_dir):
         os.makedirs(archive_dir)
@@ -35,7 +56,6 @@ def update_news():
     existing_links = set()
     current_archive_data = []
 
-    # 如果今天已经有存档，先读出来
     if os.path.exists(archive_path):
         try:
             with open(archive_path, 'r', encoding='utf-8') as f:
@@ -43,16 +63,12 @@ def update_news():
                 for item in current_archive_data:
                     existing_links.add(item['link'])
         except:
-            print("⚠️ 读取旧存档失败，将创建新存档")
+            pass
 
-    # 2. 处理新抓取的数据
     new_items_count = 0
     
-    # 我们只看 RSS 的前 15 条（热度最高的）
     for entry in feed.entries[:15]:
         link = entry.link
-        
-        # 去重：如果这个链接今天已经存过了，就跳过
         if link in existing_links:
             continue
 
@@ -61,19 +77,15 @@ def update_news():
         except:
             zh_title = entry.title
         
-        # 尝试提取图片 (Yahoo RSS 格式不定，尝试几种常见字段)
         image_url = ""
-        # 1. 尝试 media_thumbnail
         if 'media_thumbnail' in entry and len(entry.media_thumbnail) > 0:
             image_url = entry.media_thumbnail[0]['url']
-        # 2. 尝试 links 中的 image 类型
         elif 'links' in entry:
             for l in entry.links:
                 if 'image' in l.get('type', ''):
                     image_url = l['href']
                     break
         
-        # 获取时间
         time_str = get_current_jst_time().strftime("%H:%M")
 
         item_data = {
@@ -81,26 +93,20 @@ def update_news():
             "origin": entry.title,
             "link": link,
             "time": time_str,
-            "image": image_url  # 新增图片字段
+            "image": image_url
         }
         
-        # 添加到列表头部（最新的排前面）
         current_archive_data.insert(0, item_data)
         existing_links.add(link)
         new_items_count += 1
-        
-        # 稍微延时
         time.sleep(0.5)
 
     print(f"✅ 新增了 {new_items_count} 条新闻")
 
-    # 3. 保存今日存档 (包含之前和新增的)
     with open(archive_path, 'w', encoding='utf-8') as f:
         json.dump(current_archive_data, f, ensure_ascii=False, indent=2)
     print(f"✅ 历史存档已更新: {archive_path}")
 
-    # 4. 更新首页 data.json (只显示存档里最新的 20 条，保持首页精简)
-    # 首页数据直接用今天的存档即可
     with open('data.json', 'w', encoding='utf-8') as f:
         json.dump(current_archive_data[:20], f, ensure_ascii=False, indent=2)
     print("✅ data.json 更新成功")
