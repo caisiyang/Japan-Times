@@ -1,4 +1,5 @@
 import feedparser
+import calendar
 from deep_translator import GoogleTranslator
 import json
 import os
@@ -46,7 +47,7 @@ def fetch_all_china_news():
     entries = []
     for entry in feed.entries:
         if hasattr(entry, 'published_parsed') and entry.published_parsed:
-            pub_time = time.mktime(entry.published_parsed)
+            pub_time = calendar.timegm(entry.published_parsed)
             entries.append((pub_time, entry))
     
     entries.sort(key=lambda x: x[0], reverse=True)
@@ -66,8 +67,8 @@ def update_news():
         except:
             title_zh = title_ja
         
-        timestamp = time.mktime(entry.published_parsed)
-        time_str = time.strftime("%m-%d %H:%M", time.localtime(timestamp))
+        timestamp = calendar.timegm(entry.published_parsed)
+        time_str = datetime.datetime.fromtimestamp(timestamp, JST).strftime("%m-%d %H:%M")
         
         new_data.append({
             "title": title_zh,
@@ -90,15 +91,21 @@ def update_news():
     if os.path.exists(today_path):
         with open(today_path, 'r', encoding='utf-8') as f:
             today_list = json.load(f)
+            
+    # Update existing items and add new ones
+    today_dict = {item['link']: item for item in today_list}
     
-    existing_links = {item['link'] for item in today_list}
     added = 0
+    updated = 0
     for item in new_data:
-        if item['link'] not in existing_links:
-            today_list.append(item)
-            existing_links.add(item['link'])
+        if item['link'] in today_dict:
+            today_dict[item['link']].update(item)
+            updated += 1
+        else:
+            today_dict[item['link']] = item
             added += 1
-    
+            
+    today_list = list(today_dict.values())
     today_list.sort(key=lambda x: x['timestamp'], reverse=True)
     
     with open(today_path, 'w', encoding='utf-8') as f:
@@ -125,8 +132,8 @@ def update_news():
     with open('data.json', 'w', encoding='utf-8') as f:
         json.dump(recent_news, f, ensure_ascii=False, indent=2)
     
-    print(f"更新完成！今日总计 {len(today_list)} 条，本次新增 {added} 条，首页显示最近两天共 {len(recent_news)} 条")
-    if added > 0 and recent_news:
+    print(f"更新完成！今日总计 {len(today_list)} 条，本次新增 {added} 条，更新 {updated} 条，首页显示最近两天共 {len(recent_news)} 条")
+    if added > 0 or updated > 0:
         print("最新三条预览：")
         for item in recent_news[:3]:
             print(f"  {item['time_str']}  {item['title'][:60]}")
