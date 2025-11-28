@@ -133,8 +133,13 @@ def update_news():
     # Limit to 100 items for homepage
     homepage_news = recent_news[:100]
     
+    output_data = {
+        "last_updated": get_current_jst_time().strftime("%Y年%m月%d日 %H时%M分"),
+        "news": homepage_news
+    }
+    
     with open('data.json', 'w', encoding='utf-8') as f:
-        json.dump(homepage_news, f, ensure_ascii=False, indent=2)
+        json.dump(output_data, f, ensure_ascii=False, indent=2)
     
     print(f"更新完成！今日总计 {len(today_list)} 条，本次新增 {added} 条，更新 {updated} 条，首页显示最近两天共 {len(homepage_news)} 条（限制100条）")
     if added > 0 or updated > 0:
