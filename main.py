@@ -39,22 +39,20 @@ def classify_news(title):
 
 def fetch_google_china_news():
     print("正在抓取最新日本媒体中国新闻...")
-    # 关键修复：强制按时间排序 + 限制最近8小时（避免抓太多旧新闻）
-    url = "https://news.google.com/rss/search?q=中国&hl=ja&gl=JP&ceid=JP:ja&sort=date"
+    # 修复：加 sort=date 强制按时间倒序；when:1d 保持过去24小时
+    url = "https://news.google.com/rss/search?q=中国+when:1d&hl=ja&gl=JP&ceid=JP:ja&sort=date"
     feed = feedparser.parse(url)
     
     entries = []
-    cutoff = time.time() - 8 * 3600  # 只取最近8小时的，防止抓到几天前的
-    
-    for entry in feed.entries[:200]:  # 最多200条
+    # 去掉 cutoff 过滤，用 RSS 的 1d 限制；只取有时间戳的
+    for entry in feed.entries[:200]:
         if hasattr(entry, 'published_parsed') and entry.published_parsed:
             pub_time = time.mktime(entry.published_parsed)
-            if pub_time < cutoff:
-                continue
             entries.append((pub_time, entry))
     
-    # 按时间倒序排序
+    # 按时间倒序（最新在前）
     entries.sort(key=lambda x: x[0], reverse=True)
+    print(f"RSS 返回 {len(entries)} 条新闻（过去24小时）")
     return [e[1] for e in entries]
 
 def process_entries(entries):
@@ -97,44 +95,54 @@ def update_news():
     today_str = get_current_jst_time().strftime("%Y-%m-%d")
     archive_path = os.path.join(archive_dir, f"{today_str}.json")
     
-    # 读取今日已有 + 去重合并 + 强制时间排序
+    # 读取今日已有
     today_list = []
     if os.path.exists(archive_path):
         with open(archive_path, 'r', encoding='utf-8') as f:
             today_list = json.load(f)
     
-    existing = {item['link'] for item in today_list}
+    # 去重：用链接判断，避免重复
+    existing_links = {item['link'] for item in today_list}
+    added_count = 0
     for item in new_data:
-        if item['link'] not in existing:
-            today_list.append(item)
-            existing.add(item['link'])
+        if item['link'] not in existing_links:
+            today_list.append(item)  # append 而非 insert(0)，后面统一 sort
+            existing_links.add(item['link'])
+            added_count += 1
     
-    # 关键：最终按时间戳倒序
+    # 修复：统一按时间戳倒序排序（最新在前）
     today_list.sort(key=lambda x: x['timestamp'], reverse=True)
     
     with open(archive_path, 'w', encoding='utf-8') as f:
         json.dump(today_list, f, ensure_ascii=False, indent=2)
     
-    # 生成首页 data.json（最近100条）
+    # 生成首页 data.json：取所有存档的最新 100 条（跨天，确保最新在前）
     home_data = []
-    seen = set()
+    seen_links = set()
     today = get_current_jst_time()
     
-    for i in range(30):
+    for i in range(30):  # 最近 30 天
         date = (today - datetime.timedelta(days=i)).strftime("%Y-%m-%d")
         path = os.path.join(archive_dir, f"{date}.json")
         if os.path.exists(path):
             with open(path, 'r', encoding='utf-8') as f:
                 day_data = json.load(f)
+                # 取该天的最新条目，追加到 home_data（但限 100 条总和）
+                day_data.sort(key=lambda x: x['timestamp'], reverse=True)
                 for item in day_data:
-                    if item['link'] not in seen and len(home_data) < 100:
+                    if item['link'] not in seen_links and len(home_data) < 100:
                         home_data.append(item)
-                        seen.add(item['link'])
+                        seen_links.add(item['link'])
     
     with open('data.json', 'w', encoding='utf-8') as f:
         json.dump(home_data, f, ensure_ascii=False, indent=2)
     
-    print(f"更新完成！今日 {len(today_list)} 条，新增 {len(new_data)} 条，首页显示 {len(home_data)} 条")
+    print(f"更新完成！今日总 {len(today_list)} 条，本次新增 {added_count} 条，首页最新 {len(home_data)} 条（跨天）")
+    # 打印最新 3 条时间，方便日志确认
+    if today_list:
+        print("今日最新 3 条时间：")
+        for item in today_list[:3]:
+            print(f"- {item['time_str']}：{item['title'][:50]}")
 
 if __name__ == "__main__":
     update_news()
