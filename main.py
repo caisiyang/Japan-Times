@@ -130,8 +130,9 @@ def update_news():
     
     recent_news.sort(key=lambda x: x['timestamp'], reverse=True)
     
-    # Limit to 100 items for homepage
-    homepage_news = recent_news[:100]
+    # Limit to 100 items for homepage - REMOVED LIMIT to allow frontend to handle archive
+    # homepage_news = recent_news[:100]
+    homepage_news = recent_news
     
     output_data = {
         "last_updated": get_current_jst_time().strftime("%Y年%m月%d日 %H时%M分"),
