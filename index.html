@@ -9,7 +9,8 @@
     <meta property="og:title" content="China News from Japan">
     <meta property="og:description" content="来自日本媒体的中国报道 | 日本メディアによる中国報道">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="icon" href="logo.png" type="image/png">
     <!-- Noto Sans Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,8 +56,8 @@
 
         /* Header */
         .header {
-            background: rgba(249, 249, 247, 0.96);
-            padding: 20px 20px 10px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 24px 20px 16px 20px;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -65,6 +66,16 @@
             align-items: center;
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+
+        .header-logo {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
         .header-title {
@@ -74,20 +85,24 @@
 
         .header h1 {
             margin: 0;
-            font-size: 20px;
-            font-weight: 700;
-            font-family: "Noto Sans", serif;
-            letter-spacing: 0.5px;
+            font-size: 22px;
+            font-weight: 800;
+            font-family: "Noto Sans", sans-serif;
+            letter-spacing: -0.5px;
             color: var(--text-main);
+            background: linear-gradient(135deg, #333 0%, #555 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .header p {
-            margin: 4px 0 0 0;
-            font-size: 10px;
+            margin: 6px 0 0 0;
+            font-size: 11px;
             color: var(--accent-color);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             font-weight: 600;
+            opacity: 0.9;
         }
 
         /* Nav Buttons */
@@ -390,201 +405,6 @@
 
         .card-fav-btn path {
             fill: none;
-            line-height: 1.6;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-            border: 1px solid rgba(0, 0, 0, 0.03);
-        }
-
-        .notice-content p {
-            margin: 0 0 10px 0;
-        }
-
-        .notice-content p:last-child {
-            margin-bottom: 0;
-        }
-
-        /* Fav View */
-        .fav-list-container {
-            /* No extra styles needed, just a wrapper */
-        }
-
-        /* 控制栏 (标题 + 排序) */
-        .control-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            margin-top: 10px;
-        }
-
-        .section-title-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-        }
-
-        .section-title::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            background: var(--accent-color);
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-
-        /* Back Button */
-        .back-btn {
-            display: none;
-            font-size: 12px;
-            padding: 4px 10px;
-            background: rgba(214, 64, 69, 0.1);
-            color: var(--accent-color);
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            border: none;
-            align-items: center;
-        }
-
-        .back-btn::before {
-            content: '← ';
-            margin-right: 2px;
-        }
-
-        .sort-group {
-            display: flex;
-            gap: 8px;
-        }
-
-        .sort-btn {
-            font-size: 12px;
-            padding: 4px 10px;
-            border-radius: 12px;
-            background: #E5E5EA;
-            color: #8E8E93;
-            cursor: pointer;
-            font-weight: 500;
-            border: none;
-            font-family: "Noto Sans", sans-serif;
-        }
-
-        .sort-btn.active {
-            background: var(--text-main);
-            color: white;
-        }
-
-        /* 卡片 */
-        .card {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-            transition: transform 0.1s;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid rgba(0, 0, 0, 0.02);
-            position: relative;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .card:active {
-            transform: scale(0.98);
-        }
-
-        .card-img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            background: #f0f0f0;
-            display: none;
-        }
-
-        .card-img.show {
-            display: block;
-        }
-
-        .card-body {
-            padding: 16px;
-        }
-
-        .card-meta {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .tag {
-            font-size: 10px;
-            padding: 3px 6px;
-            border-radius: 4px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .tag-cat {
-            background: #F0F0F0;
-            color: #555;
-        }
-
-        .tag-time {
-            background: rgba(214, 64, 69, 0.08);
-            color: var(--accent-color);
-        }
-
-        .card-origin {
-            font-size: 11px;
-            color: var(--text-sub);
-            margin-left: auto;
-        }
-
-        .card-title {
-            font-size: 16px;
-            font-weight: 700;
-            line-height: 1.5;
-            color: var(--text-main);
-            margin-right: 24px;
-            /* Space for fav icon */
-        }
-
-        .card-summary {
-            font-size: 13px;
-            color: var(--text-sub);
-            margin-top: 8px;
-            line-height: 1.5;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .card-fav-btn {
-            position: absolute;
-            right: 16px;
-            bottom: 16px;
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            z-index: 10;
-        }
-
-        .card-fav-btn svg {
-            width: 100%;
-            height: 100%;
-        }
-
-        .card-fav-btn path {
-            fill: none;
             stroke: #ddd;
             stroke-width: 2;
             transition: all 0.2s;
@@ -687,6 +507,7 @@
     <div id="install-banner"><span id="install-text">添加到主屏幕，获取最佳体验</span><span id="install-close">×</span></div>
 
     <div class="header">
+        <img src="logo.png" alt="China News from Japan" class="header-logo">
         <div class="header-title">
             <h1>China News from Japan</h1>
             <p>来自日本媒体的中国报道</p>
@@ -989,6 +810,7 @@
                 : '';
 
             const summaryHtml = item.summary ? `<div class="card-summary">${item.summary}</div>` : '';
+
             return `
             <div class="card">
                 <img src="${item.image || ''}" class="${imgClass}">
