@@ -1,0 +1,26 @@
+name: Cleanup History
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # Run every Sunday at midnight
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Delete old archive files
+        run: |
+          # Delete json files in archive/ older than 30 days
+          find archive/ -name "*.json" -type f -mtime +30 -delete
+          
+      - name: Commit changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add archive/
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Cleanup old history [skip ci]" && git push)

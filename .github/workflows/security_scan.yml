@@ -1,0 +1,21 @@
+name: Security Scan
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Scan for secrets
+        run: |
+          # Simple grep scan for common secret patterns
+          # Fails if any potential secret is found
+          if grep -rE "(API_KEY|TOKEN|SECRET|PASSWORD|KEY)\s*=" . --exclude-dir=.git --exclude-dir=.github; then
+            echo "::error::Potential secrets found! Please remove them and use GitHub Secrets."
+            exit 1
+          fi
+          echo "No obvious secrets found."
