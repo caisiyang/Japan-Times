@@ -7,6 +7,12 @@
     <title>Japan Times</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
+    <!-- Noto Sans Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans:wght@400;500;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --bg-color: #F9F9F7;
@@ -18,7 +24,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Roboto, Arial, sans-serif;
+            font-family: "Noto Sans", "Noto Sans SC", "Noto Sans JP", -apple-system, BlinkMacSystemFont, "SF Pro Text", Roboto, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
             margin: 0;
@@ -47,66 +53,114 @@
         /* Header */
         .header {
             background: rgba(249, 249, 247, 0.96);
-            padding: 16px 20px;
+            padding: 20px 20px 10px 20px;
             position: sticky;
             top: 0;
             z-index: 100;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
-        .header-left {
-            width: 40px;
-        }
-
-        /* Spacer or potential left icon */
         .header-title {
             text-align: center;
-            flex: 1;
+            margin-bottom: 16px;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 700;
-            font-family: "Times New Roman", serif;
+            font-family: "Noto Sans", serif;
             letter-spacing: 0.5px;
             color: var(--text-main);
         }
 
         .header p {
-            margin: 2px 0 0 0;
-            font-size: 9px;
+            margin: 4px 0 0 0;
+            font-size: 10px;
             color: var(--accent-color);
             text-transform: uppercase;
             letter-spacing: 2px;
             font-weight: 600;
         }
 
-        /* Heart Icon - Moved to a reasonable position (right side but not edge) */
-        .fav-icon-btn {
-            font-size: 22px;
+        /* Nav Buttons */
+        .nav-bar {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            max-width: 600px;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            flex: 1;
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 10px 0;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
             position: relative;
-            width: 40px;
-            text-align: right;
-            color: var(--accent-color);
+        }
+
+        .nav-btn:active {
+            transform: scale(0.98);
+            background: #f5f5f5;
+        }
+
+        .nav-btn.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .nav-btn.active svg path {
+            fill: white;
+            stroke: white;
+        }
+
+        .nav-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Flat Heart Icon SVG */
+        .heart-icon path {
+            fill: none;
+            stroke: var(--accent-color);
+            stroke-width: 2;
+            transition: all 0.2s;
+        }
+
+        .nav-btn.active .heart-icon path {
+            fill: white;
+            stroke: white;
         }
 
         .fav-badge {
             position: absolute;
-            top: -2px;
-            right: -4px;
+            top: -5px;
+            right: -5px;
             background: var(--accent-color);
             color: white;
             font-size: 10px;
-            padding: 2px 5px;
+            padding: 2px 6px;
             border-radius: 10px;
             display: none;
-            border: 1px solid white;
+            border: 2px solid white;
+            font-weight: 700;
         }
 
         .container {
@@ -115,49 +169,45 @@
             margin: 0 auto;
         }
 
-        /* 公告栏 */
-        .notice-card {
+        /* Expandable Sections */
+        .expandable-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            opacity: 0;
+            margin-bottom: 0;
+        }
+
+        .expandable-section.open {
+            max-height: 1000px;
+            /* Arbitrary large height */
+            opacity: 1;
+            margin-bottom: 24px;
+        }
+
+        /* Notice Content */
+        .notice-content {
             background-color: var(--card-bg);
             border-radius: var(--border-radius);
-            padding: 16px;
-            margin-bottom: 24px;
-            font-size: 14px;
-            color: var(--text-main);
-            cursor: pointer;
+            padding: 20px;
+            font-size: 13px;
+            color: var(--text-sub);
+            line-height: 1.6;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
             border: 1px solid rgba(0, 0, 0, 0.03);
         }
 
-        .notice-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
+        .notice-content p {
+            margin: 0 0 10px 0;
         }
 
-        .notice-icon {
-            margin-right: 6px;
-            color: var(--accent-color);
+        .notice-content p:last-child {
+            margin-bottom: 0;
         }
 
-        .notice-arrow {
-            font-size: 10px;
-            opacity: 0.4;
-            transition: transform 0.3s;
-        }
-
-        .notice-arrow.rotate {
-            transform: rotate(180deg);
-        }
-
-        .notice-details {
-            display: none;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-            color: var(--text-sub);
-            line-height: 1.6;
-            font-size: 13px;
+        /* Fav View */
+        .fav-list-container {
+            /* No extra styles needed, just a wrapper */
         }
 
         /* 控制栏 (标题 + 排序) */
@@ -166,6 +216,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 16px;
+            margin-top: 10px;
         }
 
         .section-title-group {
@@ -223,32 +274,12 @@
             cursor: pointer;
             font-weight: 500;
             border: none;
+            font-family: "Noto Sans", sans-serif;
         }
 
         .sort-btn.active {
             background: var(--text-main);
             color: white;
-        }
-
-        /* 收藏夹视图 */
-        #fav-view {
-            display: none;
-            margin-bottom: 30px;
-        }
-
-        .fav-header {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .fav-close {
-            font-size: 12px;
-            color: var(--accent-color);
-            cursor: pointer;
         }
 
         /* 卡片 */
@@ -330,15 +361,27 @@
             position: absolute;
             right: 16px;
             bottom: 16px;
-            font-size: 18px;
-            color: #ddd;
+            width: 20px;
+            height: 20px;
             cursor: pointer;
             z-index: 10;
-            transition: color 0.2s;
         }
 
-        .card-fav-btn.active {
-            color: var(--accent-color);
+        .card-fav-btn svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .card-fav-btn path {
+            fill: none;
+            stroke: #ddd;
+            stroke-width: 2;
+            transition: all 0.2s;
+        }
+
+        .card-fav-btn.active path {
+            fill: var(--accent-color);
+            stroke: var(--accent-color);
         }
 
         /* 存档区域 */
@@ -498,42 +541,43 @@
     <div id="install-banner"><span id="install-text">添加到主屏幕，获取最佳体验</span><span id="install-close">×</span></div>
 
     <div class="header">
-        <div class="header-left"></div> <!-- Spacer -->
         <div class="header-title">
             <h1>Japan Times</h1>
             <p>Focus on China</p>
         </div>
-        <div class="fav-icon-btn" onclick="toggleFavView()">
-            ❤️
-            <span class="fav-badge" id="fav-badge">0</span>
+        <div class="nav-bar">
+            <div class="nav-btn" id="btn-about" onclick="toggleSection('about')">
+                <span>关于本站</span>
+            </div>
+            <div class="nav-btn" id="btn-fav" onclick="toggleSection('fav')">
+                <svg class="heart-icon" viewBox="0 0 24 24">
+                    <path
+                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+                <span>我的收藏</span>
+                <span class="fav-badge" id="fav-badge">0</span>
+            </div>
         </div>
     </div>
 
     <div class="container">
-        <!-- 公告栏 -->
-        <div class="notice-card" onclick="toggleNotice()">
-            <div class="notice-header">
-                <div><span class="notice-icon">●</span> 关于本站</div>
-                <div class="notice-arrow" id="n-arrow">▼</div>
-            </div>
-            <div class="notice-details" id="n-details">
-                <p>本站由日本华人制作，建于2025年11月27日。</p>
-                <p>由于中日两国新闻存在巨大矛盾和争议，因此本网站专注聚合日本媒体发布的中国新闻，尽力消除信息差。每一个小时自动抓取一次日本谷歌新闻中包含"中国"关键字的实时数据，首页展示近3天的记录，超过3天的历史新闻会收录进存档永久保存。经测试目前国内访问没有问题。</p>
-                <p>本网站全程由Gemini制作，部署在cloudflare上，目前试运营状态，还在持续更新优化中。如果你对这些新闻感兴趣，请把本网页添加到手机主屏幕上（用手机自带浏览器按分享后添加到主屏幕上即可）。</p>
+        <!-- About Section -->
+        <div class="expandable-section" id="section-about">
+            <div class="notice-content">
+                <p>由于中日两国新闻存在巨大矛盾和争议，因此本网站专注聚合日本媒体发布的中国新闻，尽力消除信息差。每一个小时自动抓取一次日本谷歌新闻中包含"中国"关键字的实时数据，首页展示近3天的记录，超过3天的历史新闻会收录进存档永久保存。经测试目前国内访问没有问题。
+                </p>
+                <p>本网站全程由Gemini制作，部署在cloudflare上，目前试运营状态，还在持续更新优化中。如果你对这些新闻感兴趣，请把本网页添加到手机主屏幕上（用手机自带浏览器按分享后添加到主屏幕上即可）。
+                </p>
                 <p style="font-size: 12px; color: #999; margin-top: 10px;">*因技术原因，网站开通前的历史数据无法抓取，尽请谅解。</p>
             </div>
         </div>
 
-        <!-- 收藏夹视图 -->
-        <div id="fav-view">
-            <div class="fav-header">
-                <span>❤️ 我的收藏</span>
-                <span class="fav-close" onclick="toggleFavView()">关闭</span>
-            </div>
-            <div id="fav-list"></div>
+        <!-- Favorites Section -->
+        <div class="expandable-section" id="section-fav">
+            <div id="fav-list" class="fav-list-container"></div>
         </div>
 
-        <!-- 控制栏 -->
+        <!-- Control Bar -->
         <div class="control-bar">
             <div class="section-title-group">
                 <div class="section-title" id="list-title">Latest News</div>
@@ -547,7 +591,7 @@
 
         <div id="news-list"></div>
 
-        <!-- 存档区域 -->
+        <!-- Archive Section -->
         <div class="archive-section" id="archive-section" style="display:none;">
             <div class="archive-header" onclick="toggleArchive()">
                 <span>📜 历史存档 (超过3天)</span>
@@ -582,12 +626,42 @@
             document.getElementById('install-close').onclick = () => document.getElementById('install-banner').style.display = 'none';
         }
 
-        function toggleNotice() {
-            const d = document.getElementById('n-details');
-            const a = document.getElementById('n-arrow');
-            const isShown = d.style.display === 'block';
-            d.style.display = isShown ? 'none' : 'block';
-            if (isShown) a.classList.remove('rotate'); else a.classList.add('rotate');
+        function toggleSection(sectionName) {
+            const aboutSec = document.getElementById('section-about');
+            const favSec = document.getElementById('section-fav');
+            const btnAbout = document.getElementById('btn-about');
+            const btnFav = document.getElementById('btn-fav');
+
+            if (sectionName === 'about') {
+                // Toggle About
+                const isOpen = aboutSec.classList.contains('open');
+                if (isOpen) {
+                    aboutSec.classList.remove('open');
+                    btnAbout.classList.remove('active');
+                } else {
+                    // Close Fav if open
+                    favSec.classList.remove('open');
+                    btnFav.classList.remove('active');
+                    // Open About
+                    aboutSec.classList.add('open');
+                    btnAbout.classList.add('active');
+                }
+            } else if (sectionName === 'fav') {
+                // Toggle Fav
+                const isOpen = favSec.classList.contains('open');
+                if (isOpen) {
+                    favSec.classList.remove('open');
+                    btnFav.classList.remove('active');
+                } else {
+                    // Close About if open
+                    aboutSec.classList.remove('open');
+                    btnAbout.classList.remove('active');
+                    // Open Fav
+                    favSec.classList.add('open');
+                    btnFav.classList.add('active');
+                    renderFavorites();
+                }
+            }
         }
 
         function toggleArchive() {
@@ -596,13 +670,6 @@
             const isShown = list.style.display === 'block';
             list.style.display = isShown ? 'none' : 'block';
             arrow.innerText = isShown ? '▼' : '▲';
-        }
-
-        function toggleFavView() {
-            const v = document.getElementById('fav-view');
-            const isShown = v.style.display === 'block';
-            v.style.display = isShown ? 'none' : 'block';
-            if (!isShown) renderFavorites();
         }
 
         function checkPWA() {
@@ -676,7 +743,7 @@
             localStorage.setItem('jt_favorites', JSON.stringify(favorites));
             updateFavBadge();
             processAndRender(); // Re-render to update heart icon
-            if (document.getElementById('fav-view').style.display === 'block') renderFavorites();
+            if (document.getElementById('section-fav').classList.contains('open')) renderFavorites();
         }
 
         function updateFavBadge() {
@@ -778,7 +845,6 @@
             const safeItem = encodeURIComponent(JSON.stringify(item));
             const isFav = favorites.some(f => f.link === item.link);
             const favIconClass = isFav ? 'card-fav-btn active' : 'card-fav-btn';
-            const favIcon = isFav ? '❤️' : '🤍';
             const category = item.category || '其他';
 
             // Only show category tag if it's NOT '其他'
@@ -796,34 +862,47 @@
                         <span class="card-origin">${item.origin.split(' - ')[0]}</span>
                     </div>
                     <div class="card-title">${item.title}</div>
-                    <div class="${favIconClass}" onclick="toggleFavorite(event, '${safeItem}')">${favIcon}</div>
+                    <div class="${favIconClass}" onclick="toggleFavorite(event, '${safeItem}')">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </div>
                 </div>
             </div>`;
         }
 
         function openModal(itemStr, isFavView = false) {
             const item = JSON.parse(decodeURIComponent(itemStr));
+            document.getElementById('m-title').innerText = item.title;
+            document.getElementById('m-origin').innerText = item.origin;
+            document.getElementById('m-btn').href = item.link;
 
-            // If opening from favorites or just opening, mark as read if it is a favorite
-            const favIndex = favorites.findIndex(f => f.link === item.link);
-            if (favIndex > -1) {
-                if (favorites[favIndex].isRead !== true) {
-                    favorites[favIndex].isRead = true;
+            const img = document.getElementById('m-img');
+            if (item.image) {
+                img.src = item.image;
+                img.style.display = 'block';
+            } else {
+                img.style.display = 'none';
+            }
+
+            document.getElementById('news-modal').style.display = 'flex';
+
+            // If opening from favorites, mark as read
+            if (isFavView) {
+                const index = favorites.findIndex(f => f.link === item.link);
+                if (index > -1 && !favorites[index].isRead) {
+                    favorites[index].isRead = true;
                     localStorage.setItem('jt_favorites', JSON.stringify(favorites));
                     updateFavBadge();
                 }
             }
-
-            const modal = document.getElementById('news-modal');
-            const img = document.getElementById('m-img');
-            document.getElementById('m-title').innerText = item.title;
-            document.getElementById('m-origin').innerText = "原文: " + item.origin;
-            document.getElementById('m-btn').href = item.link;
-            if (item.image) { img.src = item.image; img.style.display = 'block'; } else { img.style.display = 'none'; }
-            modal.style.display = 'flex';
         }
 
-        function closeModal(e) { if (e.target.id === 'news-modal') document.getElementById('news-modal').style.display = 'none'; }
+        function closeModal(e) {
+            if (e.target.id === 'news-modal') {
+                document.getElementById('news-modal').style.display = 'none';
+            }
+        }
 
         init();
     </script>
