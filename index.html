@@ -91,6 +91,7 @@
             flex: 1;
             text-align: center;
             margin-right: 48px;
+            /* Balance logo width */
         }
 
         .header h1 {
@@ -303,8 +304,6 @@
             font-size: 11px;
             color: var(--text-sub);
             margin-left: auto;
-            margin-right: 30px;
-            /* Space for favorite icon */
         }
 
         .card-title {
@@ -312,6 +311,7 @@
             font-weight: 700;
             line-height: 1.5;
             color: var(--text-main);
+            margin-right: 24px;
             margin-bottom: 6px;
         }
 
@@ -345,8 +345,7 @@
         .card-fav-btn {
             position: absolute;
             right: 16px;
-            top: 16px;
-            /* Moved to top */
+            bottom: 16px;
             width: 20px;
             height: 20px;
             cursor: pointer;
@@ -370,79 +369,26 @@
             stroke: var(--accent-color);
         }
 
-        /* Archive Section - Calendar Style */
+        /* Archive Section */
         .archive-section {
             margin-top: 40px;
         }
 
         .archive-header {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            color: var(--text-main);
-        }
-
-        .archive-header::before {
-            content: '📅 ';
-            margin-right: 8px;
-        }
-
-        .calendar-week {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .calendar-day {
-            background: white;
-            border-radius: 12px;
-            padding: 12px 8px;
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
             cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-        }
-
-        .calendar-day:hover {
-            background: rgba(214, 64, 69, 0.05);
-            border-color: var(--accent-color);
-        }
-
-        .calendar-day.active {
-            background: var(--accent-color);
-            color: white;
-            border-color: var(--accent-color);
-        }
-
-        .calendar-day.disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        .calendar-day.disabled:hover {
-            background: white;
-            border-color: rgba(0, 0, 0, 0.05);
-        }
-
-        .day-name {
-            font-size: 10px;
+            color: var(--text-sub);
             font-weight: 600;
-            text-transform: uppercase;
-            margin-bottom: 4px;
-            opacity: 0.6;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
-        .day-number {
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .day-count {
-            font-size: 9px;
-            margin-top: 4px;
-            opacity: 0.7;
+        .archive-list {
+            display: none;
+            margin-top: 16px;
         }
 
         /* Modal Styles */
@@ -466,16 +412,13 @@
 
         .modal-content {
             background: white;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
             max-height: 80vh;
-            display: flex;
-            flex-direction: column;
+            overflow-y: auto;
             position: relative;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            /* Hide overflow on container */
         }
 
         .modal-header {
@@ -484,8 +427,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-shrink: 0;
-            background: white;
         }
 
         .modal-title {
@@ -510,29 +451,6 @@
 
         .modal-body {
             padding: 20px;
-            overflow-y: auto;
-            flex: 1;
-            /* Modern hidden scrollbar */
-            scrollbar-width: thin;
-            scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
-        }
-
-        /* Webkit scrollbar styling */
-        .modal-body::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .modal-body::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .modal-body::-webkit-scrollbar-thumb {
-            background-color: rgba(0, 0, 0, 0.15);
-            border-radius: 2px;
-        }
-
-        .modal-body::-webkit-scrollbar-thumb:hover {
-            background-color: rgba(0, 0, 0, 0.25);
         }
 
         .modal-body p {
@@ -607,10 +525,13 @@
 
         <div id="news-list"></div>
 
-        <!-- Archive Section - Calendar Style -->
+        <!-- Archive Section -->
         <div class="archive-section" id="archive-section" style="display:none;">
-            <div class="archive-header">历史存档</div>
-            <div class="calendar-week" id="calendar-week"></div>
+            <div class="archive-header" onclick="toggleArchive()">
+                <span>📜 历史存档 (超过100条)</span>
+                <span id="archive-arrow">▼</span>
+            </div>
+            <div class="archive-list" id="archive-list"></div>
         </div>
     </div>
 
@@ -624,11 +545,11 @@
             <div class="modal-body">
                 <p>こんにちは、大家好。由于近日中日两国新闻存在矛盾和争议，必须把两边的新闻合在一起看才能获得完整的信息，因此本网站专注聚合日本媒体发布的中国相关新闻，尽力消除信息差，对一部分人来说是对日媒的一种监督，对另一部分人来说希望能让国内家人看到真实的本土信息报个平安。
                 </p>
-                <p>网站会每小时自动抓取一次日本谷歌新闻中包含"中国"关键字的实时数据，会包含各家日媒发布的网页链接，不做任何修改和挑选，由爬虫自动爬取并按最新发布顺序显示，这些新闻之中可能也会夹杂一些错误抓取的新闻，比如日本本土也有叫"中国"的地区，日本股市里也有带"中国"名称的股票等等，目前还在持续优化中。首页展示最近
+                <p>网站会每小时自动抓取一次日本谷歌新闻中包含“中国”关键字的实时数据，会包含各家日媒发布的网页链接，不做任何修改和挑选，由爬虫自动爬取并按最新发布顺序显示，这些新闻之中可能也会夹杂一些错误抓取的新闻，比如日本本土也有叫“中国”的地区，日本股市里也有带“中国”名称的股票等等，目前还在持续优化中。首页展示最近
                     100 条记录，超出 100 条后会自动移入最下方存档栏永久保存。目前国内访问正常，手机电脑均可访问，只是可能加载缓慢。</p>
                 <p>本站全程由 Gemini + Antigravity
                     制作，处于试运营状态，还在持续更新优化中。由于版权问题，因此只能使用机翻来翻译标题，日文正文部分请自行打开查阅，摘录全文会被判定侵权。如果你对这些新闻感兴趣，建议用手机浏览器将本页面添加到主屏幕（点击分享
-                    → "添加到主屏幕"即可获得类App的体验）。如有重大更新，本人会继续发布在这里。</p>
+                    → “添加到主屏幕”即可获得类App的体验）。如有重大更新，本人会继续发布在这里。</p>
                 <p>本站目前零成本运营，连专属域名都买不起，如果你希望日后增加更多功能让本站更好，可以扫下方二维码给作者打个小赏凑点经费。经费充足的话会考虑集成更多实用功能甚至发布成正式app等等，最后，不论打赏多少金额都非常感谢！これからもよろしくお願いいたします。
                 </p>
                 <p>来自一个不愿透露姓名的热心在日华人，希望中日友好。</p>
@@ -653,23 +574,11 @@
         </div>
     </div>
 
-    <!-- Archive Date Modal -->
-    <div class="modal-overlay" id="modal-archive" onclick="closeModal('archive')">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <div class="modal-title" id="archive-modal-title">历史存档</div>
-                <button class="modal-close" onclick="closeModal('archive')">×</button>
-            </div>
-            <div class="modal-body" id="archive-list-modal"></div>
-        </div>
-    </div>
-
     <script>
         let rawNewsData = [];
         let lastUpdated = '';
         let favorites = JSON.parse(localStorage.getItem('jt_favorites') || '[]');
         let currentFilter = 'all';
-        let archiveData = {}; // Store archive data by date
 
         function init() {
             if (/MicroMessenger/i.test(navigator.userAgent)) document.getElementById('wx-mask').style.display = 'block';
@@ -693,7 +602,6 @@
                     }
                     processAndRender();
                     updateFavBadge();
-                    renderCalendar();
                 })
                 .catch(e => {
                     console.error('Failed to load news:', e);
@@ -717,9 +625,15 @@
                 document.getElementById('modal-about').classList.remove('show');
             } else if (modalName === 'fav') {
                 document.getElementById('modal-fav').classList.remove('show');
-            } else if (modalName === 'archive') {
-                document.getElementById('modal-archive').classList.remove('show');
             }
+        }
+
+        function toggleArchive() {
+            const list = document.getElementById('archive-list');
+            const arrow = document.getElementById('archive-arrow');
+            const isShown = list.style.display === 'block';
+            list.style.display = isShown ? 'none' : 'block';
+            arrow.innerText = isShown ? '▼' : '▲';
         }
 
         function checkPWA() {
@@ -727,7 +641,7 @@
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
             if (!isStandalone && isIOS) {
                 document.getElementById('install-banner').style.display = 'flex';
-                document.getElementById('install-text').innerText = "点击底部分享按钮，选择"添加到主屏幕" 📲";
+                document.getElementById('install-text').innerText = "点击底部分享按钮，选择“添加到主屏幕” 📲";
             }
         }
 
@@ -754,13 +668,14 @@
             if (index > -1) {
                 favorites.splice(index, 1);
             } else {
+                // Add new favorite, mark as unread (isRead = false)
                 item.isRead = false;
                 favorites.unshift(item);
             }
 
             localStorage.setItem('jt_favorites', JSON.stringify(favorites));
             updateFavBadge();
-            processAndRender();
+            processAndRender(); // Re-render to update heart icon
             if (document.getElementById('modal-fav').classList.contains('show')) renderFavorites();
         }
 
@@ -815,7 +730,7 @@
 
             if (confirm(`确定要删除选中的 ${checkboxes.length} 条收藏吗？`)) {
                 const indicesToDelete = Array.from(checkboxes).map(cb => parseInt(cb.dataset.index));
-                indicesToDelete.sort((a, b) => b - a);
+                indicesToDelete.sort((a, b) => b - a); // Delete from end to start
                 indicesToDelete.forEach(index => {
                     favorites.splice(index, 1);
                 });
@@ -842,88 +757,10 @@
             }
         }
 
-        function renderCalendar() {
-            const calendarWeek = document.getElementById('calendar-week');
-            const archiveSection = document.getElementById('archive-section');
-
-            // Get current date in JST
-            const now = new Date();
-            const jstOffset = 9 * 60; // JST is UTC+9
-            const jstNow = new Date(now.getTime() + (jstOffset - now.getTimezoneOffset()) * 60000);
-
-            // Generate last 7 days
-            const days = [];
-            for (let i = 6; i >= 0; i--) {
-                const date = new Date(jstNow);
-                date.setDate(date.getDate() - i);
-                days.push(date);
-            }
-
-            // Group news by date
-            archiveData = {};
-            rawNewsData.forEach(item => {
-                if (item.timestamp) {
-                    const itemDate = new Date(item.timestamp * 1000);
-                    const dateKey = itemDate.toISOString().split('T')[0];
-                    if (!archiveData[dateKey]) {
-                        archiveData[dateKey] = [];
-                    }
-                    archiveData[dateKey].push(item);
-                }
-            });
-
-            // Render calendar
-            let html = '';
-            const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
-
-            days.forEach(date => {
-                const dateKey = date.toISOString().split('T')[0];
-                const count = archiveData[dateKey] ? archiveData[dateKey].length : 0;
-                const dayName = dayNames[date.getDay()];
-                const dayNumber = date.getDate();
-                const disabled = count === 0 ? 'disabled' : '';
-
-                html += `<div class="calendar-day ${disabled}" onclick="${count > 0 ? `showArchiveDate('${dateKey}')` : ''}">`;
-                html += `<div class="day-name">${dayName}</div>`;
-                html += `<div class="day-number">${dayNumber}</div>`;
-                html += `<div class="day-count">${count}条</div>`;
-                html += `</div>`;
-            });
-
-            calendarWeek.innerHTML = html;
-
-            // Show archive section if there's any data
-            if (Object.keys(archiveData).length > 0) {
-                archiveSection.style.display = 'block';
-            }
-        }
-
-        function showArchiveDate(dateKey) {
-            const items = archiveData[dateKey] || [];
-            if (items.length === 0) return;
-
-            // Format date for title
-            const date = new Date(dateKey);
-            const title = `${date.getMonth() + 1}月${date.getDate()}日 存档 (${items.length}条)`;
-
-            document.getElementById('archive-modal-title').textContent = title;
-
-            // Render items
-            let html = '<div style="display: flex; flex-direction: column; gap: 12px;">';
-            items.forEach(item => {
-                html += `<div style="padding: 12px; background: #f9f9f9; border-radius: 8px; border-left: 3px solid var(--accent-color);">`;
-                html += `<a href="${item.link}" target="_blank" style="color: var(--text-main); text-decoration: none; font-size: 14px; line-height: 1.6; display: block;">${item.title}</a>`;
-                html += `<div style="font-size: 11px; color: var(--text-sub); margin-top: 4px;">${item.time_str}</div>`;
-                html += `</div>`;
-            });
-            html += '</div>';
-
-            document.getElementById('archive-list-modal').innerHTML = html;
-            document.getElementById('modal-archive').classList.add('show');
-        }
-
         function processAndRender() {
             const container = document.getElementById('news-list');
+            const archiveList = document.getElementById('archive-list');
+            const archiveSection = document.getElementById('archive-section');
 
             if (!rawNewsData || rawNewsData.length === 0) {
                 container.innerHTML = '<div style="text-align:center;padding:30px;color:#ccc;">暂无相关新闻</div>';
@@ -940,8 +777,9 @@
             let sorted = [...filtered];
             sorted.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
-            // 3. Display first 100 items
+            // 3. Split by 100-item limit
             const recent = sorted.slice(0, 100);
+            const archived = sorted.slice(100);
 
             // 4. Render Recent
             let html = '';
@@ -949,6 +787,21 @@
                 html += createCardHtml(item);
             });
             container.innerHTML = html || '<div style="text-align:center;padding:20px;color:#ccc;">暂无新闻</div>';
+
+            // 5. Render Archive (simple text list)
+            if (archived.length > 0) {
+                archiveSection.style.display = 'block';
+                let archHtml = '';
+                archived.forEach(item => {
+                    archHtml += `<div style="padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05);">`;
+                    archHtml += `<a href="${item.link}" target="_blank" style="color: var(--text-main); text-decoration: none; font-size: 14px; line-height: 1.6; display: block;">${item.title}</a>`;
+                    archHtml += `<div style="font-size: 11px; color: var(--text-sub); margin-top: 4px;">${item.time_str}</div>`;
+                    archHtml += `</div>`;
+                });
+                archiveList.innerHTML = archHtml;
+            } else {
+                archiveSection.style.display = 'none';
+            }
         }
 
         function createCardHtml(item, isFavView = false) {
@@ -958,11 +811,14 @@
             const favIconClass = isFav ? 'card-fav-btn active' : 'card-fav-btn';
             const category = item.category || '其他';
 
+            // Only show category tag if it's NOT '其他'
             const catTagHtml = category !== '其他'
                 ? `<span class="tag tag-cat" onclick="event.stopPropagation(); filterByCategory('${category}')">${category}</span>`
                 : '';
 
             const summaryHtml = item.summary ? `<div class="card-summary">${item.summary}</div>` : '';
+
+            // Japanese title with link
             const titleJaHtml = item.title_ja ? `<div class="card-title-ja">原文链接：<a href="${item.link}" target="_blank" onclick="handleLinkClick(event, '${safeItem}', ${isFavView})">${item.title_ja}</a></div>` : '';
 
             return `
@@ -987,8 +843,9 @@
         }
 
         function handleLinkClick(e, itemStr, isFavView) {
-            e.stopPropagation();
+            e.stopPropagation(); // Prevent bubbling just in case
 
+            // If opening from favorites, mark as read
             if (isFavView) {
                 const item = JSON.parse(decodeURIComponent(itemStr));
                 const index = favorites.findIndex(f => f.link === item.link);
