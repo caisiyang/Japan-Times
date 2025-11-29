@@ -1,6 +1,6 @@
 let rawNewsData = [];
 let lastUpdated = '';
-let favorites = JSON.parse(localStorage.getItem('jt_favorites') || '[]');
+let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
 let currentFilter = 'all';
 let archiveData = {}; // Store grouped archive data
 let currentCalendarDate = new Date(); // For full calendar navigation
@@ -16,14 +16,20 @@ function init() {
     fetch('data.json?t=' + Date.now())
         .then(r => r.json())
         .then(data => {
-            if (data.news && data.last_updated) {
-                rawNewsData = data.news;
-                lastUpdated = data.last_updated;
+if (data.news && data.last_updated) {
+    rawNewsData = data.news;
+    lastUpdated = data.last_updated;
 
-                document.getElementById('list-title').textContent = '最新100条日媒发布的中国报道';
-                const formattedTime = lastUpdated.replace(/(\d+)年(\d+)月(\d+)日\s+(\d+)时(\d+)分/, '$1/$2/$3 $4:$5');
-                document.getElementById('last-update-time').textContent = `上一次数据抓取时间：东京时间${formattedTime}`;
-                
+              document.getElementById('list-title').textContent = '最新100条日媒发布的中国报道';
+    
+            // 1. 先把中文时间格式化成标准格式 (2025/11/29 21:22)
+             const formattedTime = lastUpdated.replace(/(\d+)年(\d+)月(\d+)日\s+(\d+)时(\d+)分/, '$1/$2/$3 $4:$5');
+    
+            // 2. 【这里改对了】直接把格式化好的时间传进去，而不是 data.update_time
+            var relativeTime = timeAgo(formattedTime); 
+
+           // 3. 显示结果
+            document.getElementById('last-update-time').innerText = '数据更新于：' + relativeTime;
             } else {
                 // Fallback for old format
                 rawNewsData = Array.isArray(data) ? data : [];
@@ -39,6 +45,52 @@ function init() {
 
     document.getElementById('install-close').onclick = () => document.getElementById('install-banner').style.display = 'none';
 }
+
+/**
+ * 升级版时间计算：支持 "1小时30分钟前" 这种精确显示
+ */
+function timeAgo(dateString) {
+    // 1. 数据清洗：把 "2025/11/29 21:22" 转为 Date 对象
+    var date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+        var pureTime = dateString.replace(/[^0-9\s:/]/g, '').trim(); 
+        date = new Date(pureTime);
+    }
+
+    var now = new Date();
+    // 计算总共差了多少秒
+    var seconds = Math.floor((now - date) / 1000);
+    
+    // 保护措施：防止时间差为负数
+    if (seconds < 0) seconds = 0;
+
+    // --- 逻辑判断开始 ---
+
+    // 1. 如果超过 24 小时 (86400秒)，还是显示 "x天前" 比较简洁
+    var days = Math.floor(seconds / 86400);
+    if (days >= 1) {
+        return days + "天前";
+    }
+    
+    // 2. 如果超过 1 小时 (3600秒)，显示 "x小时xx分钟前"
+    var hours = Math.floor(seconds / 3600);
+    if (hours >= 1) {
+        // 核心逻辑：用 % (取余数) 算出剩下的分钟
+        var remainingSeconds = seconds % 3600; 
+        var minutes = Math.floor(remainingSeconds / 60);
+        return hours + "小时" + minutes + "分钟前";
+    }
+    
+    // 3. 如果不满 1 小时，显示 "xx分钟前"
+    var minutes = Math.floor(seconds / 60);
+    if (minutes >= 1) {
+        return minutes + "分钟前";
+    }
+    
+    // 4. 如果不满 1 分钟
+    return "刚刚";
+}
+
 
 function toggleSection(sectionName) {
     if (sectionName === 'about') {
@@ -96,21 +148,33 @@ function toggleFavorite(e, itemStr) {
         favorites.unshift(item);
     }
 
-    localStorage.setItem('jt_favorites', JSON.stringify(favorites));
+    localStorage.setItem('favorites', JSON.stringify(favorites));
     updateFavBadge();
     processAndRender(); // Re-render to update heart icon
     if (document.getElementById('modal-fav').classList.contains('show')) renderFavorites();
 }
 
+// 更新收藏夹红点数字
 function updateFavBadge() {
-    const btnText = document.getElementById('fav-btn-text');
-    const count = favorites.length;
+    // 1. 获取收藏列表
+    // 假设你的收藏存在 localStorage 的 'favorites' 字段里
+    var favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    var count = favorites.length;
 
+    // 2. 获取红点元素
+    var badge = document.getElementById('fav-badge');
+    
+    // 3. 更新逻辑
     if (count > 0) {
-        btnText.innerHTML = `我的收藏（<span class="fav-count">${count}</span>）`;
+        badge.style.display = 'block'; // 有收藏时显示红点
+        badge.innerText = count > 99 ? '99+' : count; // 数字太大就显示 99+
     } else {
-        btnText.textContent = '我的收藏';
+        badge.style.display = 'none';  // 没有收藏时隐藏红点
     }
+    
+    // ⚠️ 关键：千万不要再改 fav-btn-text 的内容了！
+    // 确保文字永远是 "我的收藏"
+    document.getElementById('fav-btn-text').innerText = '我的收藏';
 }
 
 function renderFavorites() {
@@ -157,7 +221,7 @@ function deleteSelectedFavorites() {
         indicesToDelete.forEach(index => {
             favorites.splice(index, 1);
         });
-        localStorage.setItem('jt_favorites', JSON.stringify(favorites));
+        localStorage.setItem('favorites', JSON.stringify(favorites));
         updateFavBadge();
         renderFavorites();
         processAndRender(); // Task 1: Sync homepage card states
@@ -167,7 +231,7 @@ function deleteSelectedFavorites() {
 function clearAllFavorites() {
     if (confirm('确定要清空所有收藏吗？')) {
         favorites = [];
-        localStorage.setItem('jt_favorites', JSON.stringify(favorites));
+        localStorage.setItem('favorites', JSON.stringify(favorites));
         updateFavBadge();
         renderFavorites();
         processAndRender(); // Task 1: Sync homepage card states
@@ -177,7 +241,7 @@ function clearAllFavorites() {
 function markFavAsRead(index) {
     if (favorites[index]) {
         favorites[index].isRead = true;
-        localStorage.setItem('jt_favorites', JSON.stringify(favorites));
+        localStorage.setItem('favorites', JSON.stringify(favorites));
         updateFavBadge();
     }
 }
