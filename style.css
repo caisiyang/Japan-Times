@@ -1,15 +1,31 @@
+/* --- START OF FILE style.css --- */
+
 :root {
-    --primary-color: #2c3e50;
-    --accent-color: #e74c3c;
-    --bg-color: #f4f6f9;
+    --primary-color: #c62828;
+    --accent-color: #d32f2f;
+    --bg-color: #f5f7fa;
     --card-bg: #ffffff;
     --text-main: #333333;
-    --text-sub: #7f8c8d;
+    --text-sub: #666666;
+    --border-color: #eeeeee;
+    
+    /* 字体控制变量 */
+    --font-family-main: 'Noto Serif SC', 'Noto Serif TC', 'Noto Serif JP', serif;
+    --font-scale: 1.0; /* 默认比例 */
+    
     --header-height: 60px;
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.04);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --radius-md: 12px;
-    --radius-lg: 16px;
+    --radius-md: 12px; 
+    --radius-lg: 12px;
+
+    /* Dark Mode Variables */
+    --bg-color-dark: #121212;
+    --card-bg-dark: #1e1e1e;
+    --text-main-dark: #ffffff;
+    --text-sub-dark: #cccccc;
+    --border-color-dark: #333333;
+    --header-bg-dark: #1e1e1e;
 }
 
 * {
@@ -18,646 +34,316 @@
 }
 
 body {
-    /* 优先显示中文宋体，遇到日文假名自动用日文宋体，风格完全统一 */
-    font-family: 'Noto Serif SC', 'Noto Serif JP', serif;
-    
+    font-family: var(--font-family-main);
     background-color: var(--bg-color);
     margin: 0;
     padding: 0;
     color: var(--text-main);
     padding-top: var(--header-height);
     -webkit-font-smoothing: antialiased;
+    /* 全局字体大小基准，随设置调整 */
+    font-size: calc(14px * var(--font-scale));
 }
 
-/* Header */
+/* --- Header --- */
 .header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    position: fixed; top: 0; left: 0; right: 0;
     height: var(--header-height);
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    z-index: 1000;
-    box-shadow: var(--shadow-sm);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    z-index: 1000; box-shadow: var(--shadow-sm);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.3s ease-in-out;
+    border-bottom: 1px solid rgba(0,0,0,0.02);
 }
+.header.header-hidden { transform: translateY(-100%); }
 
-/* 修改 Header 内容容器 */
 .header-content {
-    width: 100%;
-    max-width: 600px;
-    padding: 0 16px;
-    height: 100%;
-    
-    /* 布局方式 */
-    display: flex;
-    justify-content: space-between; /* 标题靠左，按钮靠右 */
-    align-items: center;
-    position: relative; /* 【关键】作为绝对定位的参考坐标 */
+    width: 100%; max-width: 600px; padding: 0 16px; height: 100%;
+    display: flex; justify-content: space-between; align-items: center;
 }
 
-.header-top {
-    display: flex;
-    align-items: center;
-    /* 关键：允许这个容器缩小，给右边按钮腾位置 */
-    flex: 1; 
-    min-width: 0; 
-}
-
-.header-logo {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 40px;
-    height: 40px;
-    object-fit: cover;
-    border-radius: 6px;
-    z-index: 10;
-    
-    /* ⬇️ 新增这一行：鼠标移上去变小手，提示可点击 */
-    cursor: pointer; 
-    
-    /* 建议加个点击反馈，点下去稍微缩小一点点，体验更好 */
-    transition: transform 0.1s; 
-}
-
-/* ⬇️ 新增：点击时的动效 */
-.header-logo:active {
-    transform: translate(-50%, -50%) scale(0.9); /* 保持居中的同时缩小 */
-}
-
-/* 标题容器 */
-/* =========================================
-   Header 标题样式 (带高级阴影版)
-   ========================================= */
-
-/* 1. 标题容器 */
-.header-title {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    
-    /* 1. 放宽宽度 */
-    /* 之前是35%，改成42%左右，只要不盖住中间的Logo(32px)就行 */
-    /* 这样能给文字更多横向空间 */
-    max-width: 42%; 
-    
-    overflow: hidden; /* 超出部分切断（防止撑开页面） */
-}
-
-/* 2. 顶部大标题 (中文) */
-/* 修改大标题：强制不换行 */
 .header-title h1 {
-    margin: 0;
-    font-family: 'Noto Serif SC', 'Noto Serif JP', serif;
-    font-weight: 900;
-    line-height: 1.1;
-    margin-left: -2px;
-    
-    /* 2. 调整字号范围 */
-    /* 把最小字号从 20px 降到 16px */
-    /* 这样在极窄的手机上，它会自动变小来适应，而不是被切掉 */
-    font-size: clamp(16px, 6vw, 24px); 
-
-    /* 3. 核心代码：强制不换行！ */
-    white-space: nowrap; 
-    
-    /* 阴影保持不变 */
-    -webkit-text-stroke: 0;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
-    
-    /* 如果字实在太多，显示省略号(...)，如果你不喜欢省略号想直接切断，删掉下面这行即可 */
-    text-overflow: ellipsis; 
+    margin: 0; font-weight: 900; line-height: 1.1; font-size: 18px;
+    color: var(--text-main);
 }
-
-/* 3. 底部副标题 (英文) */
 .header-title p {
-    margin: 0;
-    margin-top: 2px;
-    font-family: 'Noto Serif SC', 'Noto Serif JP', serif;
-    font-size: 12px;
-    color: var(--text-sub);
-    line-height: 1.2;
-    font-weight: 400;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 100%;
-
-    /* ⬇️ 核心修改：给小字加一层淡淡的阴影，增加清晰度 ⬇️ */
-    /* 小字的阴影不能太大，否则会糊 */
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    margin: 0; font-size: 10px; color: var(--text-sub); letter-spacing: 0.5px;
 }
 
-.nav-bar {
-    display: flex;
-    gap: 8px; /* 两个按钮之间的间距 */
-    align-items: center;
-    flex-shrink: 0; /* 关键：防止按钮被标题挤扁 */
-}
-
-/* 修改按钮容器：变宽一点，高度自适应 */
+/* Header Buttons */
+.nav-bar { display: flex; gap: 8px; }
 .nav-btn {
-    width: 56px;  /* 从46px增加到56px，为了放下4个字 */
-    height: 48px; /* 高度设定，保持整齐 */
-    padding: 4px 2px;
-    
-    display: flex;
-    flex-direction: column; /* 上下排列 */
-    justify-content: center;
-    align-items: center;
-    gap: 3px;     /* 图标和文字之间的间距 */
-    
-    font-size: 10px; /* 小字体，放下4个字刚好 */
-    color: var(--primary-color);
-    cursor: pointer;
-    border-radius: 8px;
-    background: #f0f2f5;
-    transition: all 0.2s;
-    font-weight: 500;
-    line-height: 1; 
+    width: 32px; height: 32px;
+    display: flex; justify-content: center; align-items: center;
+    border-radius: 8px; background: transparent; cursor: pointer;
+    position: relative; /* 用于定位角标 */
+}
+.nav-btn:active { background: rgba(0,0,0,0.05); }
+.nav-icon { width: 20px; height: 20px; fill: var(--text-main); }
+
+/* Badge Correction */
+#fav-badge {
+    position: absolute; 
+    top: 0; 
+    right: 0; 
+    background-color: #e74c3c; 
+    color: white;
+    font-size: 8px; 
+    min-width: 14px; 
+    height: 14px; 
+    line-height: 14px; 
+    text-align: center; 
+    border-radius: 50%; 
+    display: none; 
+    border: 1px solid white;
+    transform: translate(30%, -30%); /* 微调位置到右上角 */
 }
 
-/* 统一控制所有导航图标的大小和颜色 */
-.nav-icon {
-    width: 18px;  /* 统一大小 */
-    height: 18px;
-    fill: var(--primary-color); /* 默认颜色为深色 */
-    display: block;
+/* Category Nav */
+.category-nav-container {
+    position: sticky; top: var(--header-height);
+    background: var(--bg-color); z-index: 900; padding: 8px 0; min-height: 48px;
 }
-
-/* 爱心图标单独指定颜色 (因为它要用来表示收藏状态) */
-.heart-icon {
-    fill: var(--accent-color); /* 红色 */
+.header.header-hidden ~ .container .category-nav-container { top: 0; transition: top 0.3s ease-in-out; }
+.category-scroll {
+    display: flex; overflow-x: auto; gap: 8px; padding: 0 16px;
+    scrollbar-width: none; align-items: center; height: 100%;
 }
+.category-scroll::-webkit-scrollbar { display: none; }
 
-/* 确保文字不换行 */
-.nav-btn span {
-    white-space: nowrap;
-    transform: scale(0.95); /* 视觉微调：如果4个字觉得挤，缩小一点点，不挤可删掉 */
+.cat-pill {
+    flex-shrink: 0; padding: 4px 10px; border-radius: 6px;
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s; border: 1px solid transparent;
+    opacity: 0.75; filter: grayscale(20%);
+}
+.cat-pill.active {
+    opacity: 1; filter: grayscale(0%);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); transform: scale(1.05);
 }
 
 /* Container */
 .container {
-    position: relative; 
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 10px;
-    padding-bottom: 40px;
-    min-height: 100vh; 
+    position: relative; max-width: 600px; margin: 0 auto;
+    padding-bottom: 40px; min-height: 100vh;
 }
-
-/* Control Bar */
 .control-bar {
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto 0 auto;
-    padding: 4px 4px 15px 18px;
-    text-align: left;
+    width: 100%; padding: 0 16px 12px 16px;
+    display: flex; justify-content: space-between; align-items: flex-end;
 }
-
+.control-info { display: flex; flex-direction: column; justify-content: flex-end; max-width: 60%; }
 #list-title {
-    font-size: 12px !important;
-    font-weight: bold !important;
-    margin: 0 auto !important;
-    color: var(--text-sub);
+    font-size: 13px !important; font-weight: bold !important;
+    color: var(--text-main); margin-bottom: 2px; line-height: 1.2;
 }
-
 #last-update-time {
-    font-size: 12px !important;
-    color: var(--text-sub) !important;
-    margin: 0 auto !important;
+    font-size: 10px !important; color: var(--text-sub) !important; font-weight: 400;
 }
 
-
-.back-btn {
-    display: none;
-    align-items: center;
-    padding: 4px 10px;
-    background: var(--primary-color);
-    color: white;
-    border-radius: 14px;
-    font-size: 12px;
-    border: none;
-    margin-top: 4px;
-    width: fit-content;
-    cursor: pointer;
+/* Search */
+.search-wrapper { position: relative; width: 110px; }
+.search-input {
+    width: 100%; padding: 5px 10px 5px 26px;
+    border-radius: var(--radius-md); border: 1px solid rgba(0,0,0,0.1);
+    background: #ffffff; font-size: 11px; font-family: inherit;
+    outline: none; color: var(--text-main); transition: width 0.2s;
+}
+.search-input:focus {
+    border-color: var(--primary-color); width: 140px; position: absolute; right: 0; z-index: 10;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.search-icon-small {
+    position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
+    width: 12px; height: 12px; fill: #999; pointer-events: none; z-index: 11;
 }
 
-/* Card List */
-#news-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
+/* News List & Cards */
+#news-list { display: flex; flex-direction: column; gap: 12px; padding: 0 10px; }
 
 .card {
-    background: var(--card-bg);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.2s, box-shadow 0.2s;
-    position: relative;
-    cursor: pointer;
+    background: var(--card-bg); border-radius: var(--radius-lg);
+    overflow: hidden; box-shadow: var(--shadow-sm);
+    position: relative; cursor: default;
     border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
-.card:active {
-    transform: scale(0.99);
-}
-
-.card-img {
-    width: 100%;
-    height: 160px;
-    object-fit: cover;
-    display: none;
-}
-
-.card-img.show {
-    display: block;
-}
-
 .card-body {
-    padding: 16px;
-    padding-right: 40px;
-    /* Space for fav icon */
+    padding: 12px; display: flex; justify-content: space-between; align-items: stretch; gap: 10px;
 }
 
-.card-meta {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-    flex-wrap: wrap;
+.card-content-left {
+    flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-start;
 }
+.card-content-right {
+    display: flex; flex-direction: column; justify-content: space-between;
+    align-items: flex-end; min-width: 70px; flex-shrink: 0;
+}
+
+.card-image-right {
+    width: 64px; height: 64px; border-radius: 8px; overflow: hidden;
+    background: #f9f9f9; display: none; border: 1px solid rgba(0,0,0,0.03); margin-top: 4px;
+}
+.card-image-right.has-image { display: block; }
+.card-image-right img { width: 100%; height: 100%; object-fit: cover; }
+.card-image-right img.is-logo { object-fit: contain; padding: 10px; }
+
+.card-origin-text {
+    font-size: 10px; color: var(--text-sub); text-align: right;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px;
+}
+
+.card-meta-left { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
+
+.card-fav-icon {
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; margin-right: 2px;
+}
+.card-fav-icon svg { width: 16px; height: 16px; fill: #ddd; transition: all 0.2s; }
+.card-fav-icon.active svg { fill: var(--accent-color); transform: scale(1.1); }
 
 .tag {
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-weight: 600;
-    text-transform: uppercase;
+    font-size: 10px; padding: 2px 8px; border-radius: 4px; 
+    font-weight: 600; white-space: nowrap; cursor: pointer;
 }
+.tag-time { background: #f5f5f5; color: #999; font-weight: 400; cursor: default; }
 
-.tag-cat {
-    background: #e3f2fd;
-    color: #1976d2;
-}
-
-.tag-time {
-    background: #f5f5f5;
-    color: #666;
-}
-
-.card-origin {
-    font-size: 11px;
-    color: #999;
-    margin-left: auto;
-    margin-right: 30px;
-    /* Avoid overlap with fav icon */
-}
+/* Colors */
+.tag-cat-politics { background: #E3F2FD; color: #1565C0; }
+.tag-cat-economy { background: #E0F2F1; color: #00695C; }
+.tag-cat-society { background: #FFF3E0; color: #E65100; }
+.tag-cat-military { background: #FFEBEE; color: #C62828; }
+.tag-cat-tech { background: #F3E5F5; color: #6A1B9A; }
+.tag-cat-sports { background: #E1F5FE; color: #0277BD; }
+.tag-cat-other { background: #FFEBEE; color: #B71C1C; }
+.tag-cat-all { background: #333; color: #fff; }
 
 .card-title {
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 1.5;
-    margin-bottom: 6px;
-    color: var(--primary-color);
+    /* 响应式字体 */
+    font-size: calc(15px * var(--font-scale));
+    font-weight: 700; line-height: 1.45;
+    margin-bottom: 8px; color: var(--text-main);
+    display: -webkit-box; -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical; overflow: hidden;
+    user-select: text;
 }
-
 .card-title-ja {
-    font-size: 12px;
-    color: var(--text-sub);
-    margin-top: 4px;
-    line-height: 1.4;
+    font-size: calc(11px * var(--font-scale));
+    margin-top: 2px; line-height: 1.3;
+    display: -webkit-box; -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical; overflow: hidden;
 }
-
 .card-title-ja a {
-    color: var(--text-sub);
-    text-decoration: none;
+    color: var(--text-sub); text-decoration: underline; text-decoration-color: rgba(0,0,0,0.2);
+    cursor: pointer; padding: 4px 0;
 }
 
-.card-summary {
-    font-size: 13px;
-    color: #666;
-    margin-top: 8px;
-    line-height: 1.5;
-    
-    /* --- 核心的多行省略代码 --- */
-    display: -webkit-box;         /* 必须写这个，不能是 flex */
-    -webkit-line-clamp: 2;        /* 限制显示 2 行 */
-    -webkit-box-orient: vertical; /* 编辑器通常在这里报错，忽略即可 */
-    overflow: hidden;             /* 超出部分隐藏 */
-    /* ----------------------- */
-    
-    text-overflow: ellipsis;      /* 保险起见加上这行，虽然 webkit-box 通常不需要 */
+/* --- Inline Archive (Grid 8) --- */
+.inline-archive-container {
+    padding: 10px 0; margin: 10px 0;
 }
-
-/* Favorite Button on Card */
-.card-fav-btn {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    z-index: 2;
-}
-
-.card-fav-btn svg {
-    width: 18px;
-    height: 18px;
-    fill: #ccc;
-    transition: fill 0.2s;
-}
-
-.card-fav-btn.active svg {
-    fill: var(--accent-color);
-}
-
-/* Archive Section */
-.archive-section {
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px dashed #ddd;
-}
-
-.archive-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 4px;
-    font-weight: 600;
-    color: var(--text-sub);
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-/* Calendar Styles */
+/* 强制单行8列 */
 .calendar-week {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
-    margin-bottom: 20px;
+    grid-template-columns: repeat(8, 1fr); /* 8列 */
+    gap: 4px; /* 间距缩小 */
 }
-
 .calendar-day {
-    background: white;
-    border-radius: 8px;
-    padding: 8px 4px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-shadow: var(--shadow-sm);
-    cursor: pointer;
-    transition: transform 0.1s, background 0.1s;
+    background: white; border-radius: 8px; padding: 0;
+    height: 54px; /* 固定高度 */
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: pointer; border: 1px solid transparent;
 }
+.calendar-day.disabled { opacity: 0.5; pointer-events: none; background: #f9f9f9; }
+.day-name { font-size: 8px; color: #aaa; margin-bottom: 1px; line-height: 1; }
+.day-number { font-size: 11px; font-weight: 700; color: var(--text-main); line-height: 1.2; }
+.day-count { font-size: 8px; color: #999; line-height: 1; margin-top: 1px; }
 
-.calendar-day:active {
-    transform: scale(0.95);
+.calendar-day-today { border: 1px solid var(--primary-color); background: #fff5f5; }
+.archive-btn-block { background: var(--text-main); color: white; }
+.archive-btn-block .day-name { color: rgba(255,255,255,0.7); }
+.archive-btn-block .day-number { color: white; font-size: 14px; }
+
+/* Settings */
+.settings-group {
+    margin-bottom: 16px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 16px;
 }
-
-.calendar-day.disabled {
-    background: #f0f0f0;
-    opacity: 0.6;
-    cursor: default;
-    pointer-events: none;
+.settings-group:last-child { border-bottom: none; }
+.settings-group-title { font-size: 12px; color: #999; margin-bottom: 8px; padding-left: 4px; }
+.settings-row {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
 }
-
-.day-name {
-    font-size: 10px;
-    color: #999;
-    margin-bottom: 2px;
+/* 设置菜单字体大小跟随变量 */
+.settings-row span { font-size: calc(13px * var(--font-scale)); }
+.settings-btn-group { display: flex; gap: 8px; }
+.settings-option-btn {
+    padding: 6px 12px; border-radius: 6px; border: 1px solid #ddd;
+    background: #f5f5f5; color: #333; font-size: calc(12px * var(--font-scale)); cursor: pointer;
+    min-width: 60px; text-align: center;
 }
-
-.day-number {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--primary-color);
+.settings-option-btn.active {
+    background: var(--primary-color); color: white; border-color: var(--primary-color);
 }
-
-.day-count {
-    font-size: 9px;
-    background: #e3f2fd;
-    color: #1976d2;
-    padding: 1px 4px;
-    border-radius: 4px;
-    margin-top: 4px;
+.disclaimer-text {
+    font-size: calc(11px * var(--font-scale));
+    color: #999; line-height: 1.5; padding: 10px; background: #f9f9f9; border-radius: 8px;
 }
 
 /* Modals */
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 2000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    opacity: 0;
-    transition: opacity 0.3s;
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.6); z-index: 2000;
+    display: none; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
 }
-
-.modal-overlay.show {
-    display: flex;
-    opacity: 1;
-}
-
+.modal-overlay.show { display: flex; }
 .modal-content {
-    background: white;
-    width: 90%;
-    max-width: 400px;
-    max-height: 80vh;
-    border-radius: 20px;
-    box-shadow: var(--shadow-md);
-    display: flex;
-    flex-direction: column;
-    transform: translateY(20px);
-    transition: transform 0.3s;
-    overflow: hidden;
+    background: white; width: 85%; max-width: 360px; max-height: 80vh;
+    border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    display: flex; flex-direction: column; overflow: hidden;
 }
-
-.modal-overlay.show .modal-content {
-    transform: translateY(0);
-}
-
 .modal-header {
-    padding: 16px;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: white;
-    z-index: 10;
+    padding: 12px 16px; border-bottom: 1px solid #eee;
+    display: flex; justify-content: space-between; align-items: center;
 }
+.modal-title { font-weight: 700; font-size: 16px; }
+.modal-body { padding: 16px; overflow-y: auto; }
 
-.modal-title {
-    font-size: 18px;
-    font-weight: 700;
-}
+/* List Item */
+.list-item { padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.05); background: var(--card-bg); }
+.list-item a { color: var(--text-main); text-decoration: none; font-size: 13px; display: block; margin-bottom: 4px; font-weight: 500; }
+.list-item-meta { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-sub); }
+.btn-delete { color: #e74c3c; cursor: pointer; background: rgba(231, 76, 60, 0.08); padding: 2px 6px; border-radius: 4px; }
 
-.modal-close {
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #999;
-    cursor: pointer;
-    padding: 0;
-    line-height: 1;
-}
+/* Dark Mode */
+body.dark-mode { background-color: var(--bg-color-dark); color: var(--text-main-dark); }
+body.dark-mode .header { background: rgba(30, 30, 30, 0.98); border-bottom-color: #333; }
+body.dark-mode .header-title h1 { color: #ffffff !important; }
+body.dark-mode .nav-icon { fill: #ffffff; }
+body.dark-mode .card { background: var(--card-bg-dark); border-color: #333; }
+body.dark-mode .card-title { color: #ffffff; }
+body.dark-mode .category-nav-container { background: var(--bg-color-dark); }
+body.dark-mode .search-input { background: #2c2c2c; color: #ffffff; border-color: #444; }
+body.dark-mode .tag-time { background: #333; color: #888; }
+body.dark-mode .card-image-right { background: #2a2a2a; border-color: #333; }
+body.dark-mode .modal-content, body.dark-mode .modal-header { background: #252525; color: #ffffff; border-color: #333; }
+body.dark-mode .list-item { background: #252525; border-bottom-color: #333; }
+body.dark-mode .list-item a { color: #ffffff; }
+body.dark-mode .settings-option-btn { background: #333; color: #fff; border-color: #444; }
+body.dark-mode .disclaimer-text { background: #333; color: #aaa; }
+body.dark-mode .calendar-day { background: #252525; }
+body.dark-mode .day-number { color: #fff; }
+body.dark-mode .archive-btn-block { background: #444; color: #fff; }
+body.dark-mode .card-title-ja a { color: #bbb; text-decoration-color: #555; }
 
-.modal-body {
-    padding: 16px;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    /* Modern Scrollbar for Modal */
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
-}
-
-.modal-body::-webkit-scrollbar {
-    width: 4px;
-}
-
-.modal-body::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.modal-body::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-}
-
-/* Install Banner */
-#install-banner {
-    display: none;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--primary-color);
-    color: white;
-    padding: 12px 16px;
-    z-index: 3000;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-}
-
-#install-close {
-    font-size: 20px;
-    margin-left: 10px;
-    cursor: pointer;
-}
-
-/* WX Mask */
-#wx-mask {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 9999;
-    display: none;
-    color: #fff;
-    text-align: right;
-    padding-top: 20px;
-}
-
-/* UI Enhancement: Today Highlight */
-.calendar-day-today {
-    background-color: #e3f2fd !important;
-    border: 2px solid var(--primary-color) !important;
-    transform: scale(1.05);
-}
-
-.calendar-day-today .day-name {
-    color: var(--primary-color);
-    font-weight: bold;
-}
-
-.calendar-day-today .day-number {
-    color: var(--primary-color);
-    font-weight: 900;
-}
-
-/* Full Calendar Styles */
-#archive-modal-body {
-    max-height: 70vh;
-    overflow-y: auto;
-}
-
-/* Mobile optimization for calendar grid */
-@media (max-width: 480px) {
-    .calendar-day {
-        min-width: 45px;
-        /* Ensure touch targets are big enough */
-    }
-}
-
-/* =========================================
-   全局宋体增强配置
-   ========================================= */
-
-/* 1. 让标题和关键文字更粗壮有质感 */
-h1, h2, h3, .header-title h1, .card-title, .modal-title, .nav-btn {
-    font-family: 'Noto Serif SC', 'Noto Serif JP', serif;
-    font-weight: 700; /* 强制粗体 */
-    letter-spacing: -0.02em; /* 稍微收紧一点字距，显得更紧凑有力 */
-}
-
-/* 2. 日文部分完美融合 */
-/* 因为 Noto Serif JP 和 SC 是同一个家族，所以不需要额外指定字体，只需要微调字号即可 */
-.card-title-ja, .card-origin {
-    font-weight: 500;
-}
-
-/* 3. 按钮文字微调 */
-.nav-btn {
-    font-size: 11px; /* 宋体比黑体看起来稍微小一点，这里稍微加大 */
-}
-
-/* 强制允许内容溢出按钮边界，确保红点不被切掉 */
-#btn-fav {
-    position: relative !important;
-    overflow: visible !important; /* 关键！没有这句，红点就会被隐藏 */
-}
-
-/* 再次确认红点样式 */
-#fav-badge {
-    position: absolute;
-    top: -5px;    /* 往上提一点 */
-    right: -5px;  /* 往右挪一点 */
-    background-color: #e74c3c; /* 红色 */
-    color: white;
-    font-size: 10px;
-    font-weight: bold;
-    min-width: 16px;
-    height: 16px;
-    line-height: 16px;
-    text-align: center;
-    border-radius: 10px;
-    z-index: 999; /* 确保层级最高 */
-    display: none; /* 默认隐藏，JS有数字时会改成 block */
-}
-
+/* Sports Tag Dark Mode Fix */
+body.dark-mode .tag-cat-sports { background: #004d40; color: #e0f2f1; }
+/* Other Tags Dark Mode */
+body.dark-mode .tag-cat-politics { background: #1a2f42; color: #90caf9; }
+body.dark-mode .tag-cat-economy { background: #1a332e; color: #80cbc4; }
+body.dark-mode .tag-cat-society { background: #3e2723; color: #ffcc80; }
+body.dark-mode .tag-cat-military { background: #311b1b; color: #ef9a9a; }
+body.dark-mode .tag-cat-tech { background: #2d1a33; color: #ce93d8; }
+body.dark-mode .tag-cat-other { background: #3b1818; color: #ffab91; }
+body.dark-mode .tag-cat-all { background: #555; color: #fff; }

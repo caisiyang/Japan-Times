@@ -57,21 +57,31 @@ def fetch_all_china_news():
 def update_news():
     new_entries = fetch_all_china_news()
     new_data = []
-    translator = GoogleTranslator(source='ja', target='zh-CN')
+    translator_sc = GoogleTranslator(source='ja', target='zh-CN')
+    translator_tc = GoogleTranslator(source='ja', target='zh-TW')
     
     for entry in new_entries:
         link = entry.link
         title_ja = entry.title
+        
+        # 简体中文翻译
         try:
-            title_zh = translator.translate(title_ja)
+            title_zh = translator_sc.translate(title_ja)
         except:
             title_zh = title_ja
+            
+        # 繁体中文翻译 (直接从日文翻译)
+        try:
+            title_tc = translator_tc.translate(title_ja)
+        except:
+            title_tc = title_ja
         
         timestamp = calendar.timegm(entry.published_parsed)
         time_str = datetime.datetime.fromtimestamp(timestamp, JST).strftime("%m-%d %H:%M")
         
         new_data.append({
             "title": title_zh,
+            "title_tc": title_tc, # 新增繁体中文标题
             "title_ja": title_ja,
             "link": link,
             "image": extract_image(entry),
