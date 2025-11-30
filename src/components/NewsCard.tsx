@@ -12,6 +12,7 @@ export interface NewsItem {
   time_str?: string;
   origin?: string;
   category?: string;
+  original_title?: string; // 新增：日文原标题字段
 }
 
 interface NewsCardProps {
@@ -72,7 +73,7 @@ export default function NewsCard({
   return (
     <div className="w-full bg-white dark:bg-[#1e1e1e] p-4 rounded-2xl shadow-sm border border-black/5 dark:border-white/5 hover:shadow-md transition-all duration-300">
       <div className="flex items-start justify-between gap-3">
-        <div className="flex-1 flex flex-col gap-2">
+        <div className="flex-1 flex flex-col gap-2 min-w-0">
           
           {/* 顶部信息栏 */}
           <div className="flex items-center gap-2">
@@ -120,7 +121,7 @@ export default function NewsCard({
             </span>
           </div>
 
-          {/* 标题：改为 div，去掉了 href 和 点击事件，防止误触 */}
+          {/* 标题：不可点击，纯展示 */}
           <div
             style={fontStyleObj}
             className="text-[17px] font-bold text-[var(--text-main)] leading-snug tracking-normal line-clamp-2 cursor-text"
@@ -135,12 +136,11 @@ export default function NewsCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 style={fontStyleObj}
-                className="text-[11px] text-[var(--text-sub)] font-medium hover:text-[var(--primary)] underline decoration-1 underline-offset-2 flex items-center gap-0.5 transition-colors"
+                className="text-[11px] text-[var(--text-sub)] font-medium hover:text-[var(--primary)] underline decoration-1 underline-offset-2 block truncate transition-colors"
+                title={item.original_title} // 鼠标悬停显示完整日文标题
              >
-                JP {item.origin}
+                JP {item.origin} {item.original_title ? `: ${item.original_title}` : ""}
              </a>
-             
-             {/* 删除了右侧重复的来源显示 */}
           </div>
         </div>
       </div>
