@@ -376,6 +376,19 @@
     "logo": "https://www.google.com/s2/favicons?domain=news.yahoo.co.jp&sz=128"
   },
   {
+    "title": "中国同意欧盟推动解决荷兰网络之外的 Nexperia 问题 - 路透",
+    "title_tc": "中國同意歐盟推動解決荷蘭網絡外的 Nexperia 問題 - 路透",
+    "title_ja": "ネクスペリア問題、中国がＥＵと解決促進で合意 オランダ蚊帳の外 - Reuters",
+    "link": "https://news.google.com/rss/articles/CBMigAFBVV95cUxNSnlSYnRuZzgzR1BEMFJPR1Byb0NoY01iS2VFc1k4dVotbG9wMm1LLXVNcnpYOTVmREdZVjRvc3FUMVVTTkU1MU42MThCS1owVWlQemZkVmVacG9TOFZpZTFSV3Bqc3BJN204WnRHSDB2T3BWeVNvdE02cUFRVWtWNA?oc=5",
+    "image": "",
+    "logo": "https://www.google.com/s2/favicons?domain=jp.reuters.com&sz=128",
+    "summary": "",
+    "category": "其他",
+    "time_str": "11-27 07:30",
+    "timestamp": 1764196232,
+    "origin": "Reuters"
+  },
+  {
     "title": "中国再次警告不要前往日本“据报道有数人因侮辱和袭击而受伤” - 路透中文网",
     "title_tc": "中國再次警告不要前往日本“據報導有數人因侮辱和襲擊而受傷” - 路透中文網",
     "title_ja": "中国、日本渡航に再警告 「侮辱や暴行で複数の負傷報告」 - Reuters",
@@ -387,5 +400,18 @@
     "time_str": "11-27 00:46",
     "timestamp": 1764171974,
     "origin": "Reuters"
+  },
+  {
+    "title": "中国再次警告不要前往日本“据报道有数人因侮辱和袭击而受伤”（路透社） - 雅虎！消息",
+    "title_tc": "中國再次警告不要前往日本“據報導有數人因侮辱和襲擊而受傷”（路透社） - 雅虎！消息",
+    "title_ja": "中国、日本渡航に再警告 「侮辱や暴行で複数の負傷報告」（ロイター） - Yahoo!ニュース",
+    "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTFBnTU41aU0xblpuWjV6UUhNVVRWSERqVzVyY0VMUFByQ2F0ZUs4WHlmSEFVYkoxSWs0T2hDcVBLTmUzSHVsQmRSU0hiREE4cmwtTEM1RndkZkNnZE1wS1RtUHB1bDRtWjc5VU9sTU5Fa29vVU0yZGdsQ3JxaGFjYVU?oc=5",
+    "image": "",
+    "logo": "https://www.google.com/s2/favicons?domain=news.yahoo.co.jp&sz=128",
+    "summary": "",
+    "category": "其他",
+    "time_str": "11-27 00:46",
+    "timestamp": 1764171974,
+    "origin": "Yahoo!ニュース"
   }
 ]
