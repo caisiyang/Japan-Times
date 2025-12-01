@@ -69,11 +69,11 @@ export default function Header({
             </div>
             <div className="flex flex-col justify-center" style={{ width: 'fit-content' }}>
               <h1
-                style={fontStyleObj}
-                className="text-lg font-bold tracking-wide text-[var(--text-main)] leading-tight"
-                sx={{
+                style={{
+                  ...fontStyleObj,
                   textShadow: '0 1px 2px rgba(0,0,0,0.1)'
                 }}
+                className="text-lg font-bold tracking-wide text-[var(--text-main)] leading-tight"
               >
                 {settings.lang === "sc" ? "从日本看中国" : "從日本看中國"}
               </h1>
