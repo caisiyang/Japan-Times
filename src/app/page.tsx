@@ -46,7 +46,7 @@ export default function Home() {
     "台湾": "台灣"
   };
 
-  // SECTION 2: Hot Keywords (Auto-extracted, 15 results)
+  // SECTION 2: Hot Keywords (Auto-extracted)
   const hotKeywords = useMemo(() => {
     if (!rawNewsData || rawNewsData.length === 0) return [];
 
@@ -62,35 +62,34 @@ export default function Home() {
     ]);
 
     const wordCounts: Record<string, number> = {};
-    const segmenter = new Intl.Segmenter('zh-CN', { granularity: 'word' });
-
-    rawNewsData.forEach(item => {
-      if (!item.title) return;
-
-      const cleanTitle = item.title.trim();
-      const segments = segmenter.segment(cleanTitle);
-
-      for (const { segment, isWordLike } of segments) {
-        if (!isWordLike) continue;
-
-        const word = segment.trim();
-
-        if (
-          word.length < 2 ||
-          STOP_WORDS.has(word) ||
-          SOURCE_BLACKLIST.has(word) ||
-          /^\d+$/.test(word) ||
-          /^\d+月$/.test(word) ||
-          /^\d{4}$/.test(word) ||
-          /^[a-zA-Z]+$/.test(word)
-        ) {
-          continue;
-        }
-
-        const weight = word.length >= 3 ? 1.5 : 1;
-        wordCounts[word] = (wordCounts[word] || 0) + weight;
-      }
-    });
+    // Fallback if Segmenter not supported (though most modern browsers do)
+    const hasSegmenter = typeof Intl !== 'undefined' && (Intl as any).Segmenter;
+    
+    if (hasSegmenter) {
+        const segmenter = new (Intl as any).Segmenter('zh-CN', { granularity: 'word' });
+        rawNewsData.forEach(item => {
+          if (!item.title) return;
+          const cleanTitle = item.title.trim();
+          const segments = segmenter.segment(cleanTitle);
+          for (const { segment, isWordLike } of segments) {
+            if (!isWordLike) continue;
+            const word = segment.trim();
+            if (
+              word.length < 2 ||
+              STOP_WORDS.has(word) ||
+              SOURCE_BLACKLIST.has(word) ||
+              /^\d+$/.test(word) ||
+              /^\d+月$/.test(word) ||
+              /^\d{4}$/.test(word) ||
+              /^[a-zA-Z]+$/.test(word)
+            ) {
+              continue;
+            }
+            const weight = word.length >= 3 ? 1.5 : 1;
+            wordCounts[word] = (wordCounts[word] || 0) + weight;
+          }
+        });
+    }
 
     return Object.entries(wordCounts)
       .sort(([wordA, a], [wordB, b]) => {
@@ -101,30 +100,24 @@ export default function Home() {
       .map(([word]) => word);
   }, [rawNewsData]);
 
-  // SECTION 3: Hot Sources (Chinese source names from titles, 10 results)
+  // SECTION 3: Hot Sources
   const hotSources = useMemo(() => {
     if (!rawNewsData || rawNewsData.length === 0) return [];
-
     const SOURCE_NAMES = new Set([
       "雅虎新闻", "雅虎", "共同社", "路透社", "路透", "产经新闻", "日本经济新闻", "日经新闻", "朝日新闻", "每日新闻",
       "读卖新闻", "时事通信", "时事通讯社", "日刊体育", "东洋经济", "钻石在线", "中央日报", "朝日电视台",
       "NHK", "TBS", "东京新闻", "富士电视台", "产经体育", "体育日报"
     ]);
-
     const sourceCounts: Record<string, number> = {};
-
     rawNewsData.forEach(item => {
       if (!item.title) return;
-
       const cleanTitle = item.title.trim();
-
       SOURCE_NAMES.forEach(sourceName => {
         if (cleanTitle.includes(sourceName)) {
           sourceCounts[sourceName] = (sourceCounts[sourceName] || 0) + 1;
         }
       });
     });
-
     return Object.entries(sourceCounts)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 10)
@@ -136,36 +129,29 @@ export default function Home() {
     setShowSuggestions(false);
   };
 
-  // Close suggestions on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
-        // Do nothing here, backdrop handles the close
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
-  // Modals
   const [showSettings, setShowSettings] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showFav, setShowFav] = useState(false);
   const [showArchive, setShowArchive] = useState(false);
   const [archiveDate, setArchiveDate] = useState("");
 
-  // Pull to Refresh State
   const [pullStartY, setPullStartY] = useState(0);
   const [pullCurrentY, setPullCurrentY] = useState(0);
   const PULL_THRESHOLD = 80;
 
-  // Debounce timer
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // --- Effects ---
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -216,19 +202,16 @@ export default function Home() {
     setArchiveData(newData);
   }, [rawNewsData]);
 
-  // --- Scroll Handler ---
   useEffect(() => {
     const handleScroll = () => {
       if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
         setVisibleCount((prev) => (prev < 100 ? prev + 25 : prev));
       }
     };
-
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // --- Pull to Refresh Logic ---
   const handleTouchStart = (e: React.TouchEvent) => {
     if (window.scrollY === 0) {
       setPullStartY(e.touches[0].clientY);
@@ -261,14 +244,11 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // --- Debounced Search ---
   const handleSearchInput = useCallback((val: string) => {
     setSearchInput(val);
-
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
     }
-
     searchTimeoutRef.current = setTimeout(() => {
       setSearchQuery(val.trim());
       setVisibleCount(25);
@@ -281,7 +261,6 @@ export default function Home() {
     setVisibleCount(25);
   };
 
-  // --- Logic ---
   const filteredItems = useMemo(() => {
     let filtered = rawNewsData;
     if (currentFilter !== "all") {
@@ -359,7 +338,6 @@ export default function Home() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Pull to Refresh Indicator */}
       <div
         className="fixed top-0 left-0 w-full flex justify-center items-center pointer-events-none z-[60] transition-all duration-200"
         style={{
@@ -379,9 +357,7 @@ export default function Home() {
         onRefresh={handleRefresh}
         favCount={favorites.length}
       >
-        {/* Utility Bar (Search & Archive) */}
         <div className="flex justify-between items-center gap-3 relative z-50">
-          {/* Search Input - Minimalist Underline Style */}
           <div
             ref={searchContainerRef}
             className="flex-1 relative"
@@ -396,21 +372,20 @@ export default function Home() {
                 onChange={(e) => handleSearchInput(e.target.value)}
                 onFocus={() => setShowSuggestions(true)}
               />
+              {/* --- 修改后的 Clear Button --- */}
               {searchInput && (
                 <button
                   onClick={handleClearSearch}
-                  className="p-0.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors flex-shrink-0"
+                  title="Clear search"
+                  className="w-5 h-5 flex items-center justify-center rounded-full bg-gray-200 dark:bg-white/10 hover:bg-gray-300 dark:hover:bg-white/20 hover:scale-110 active:scale-95 transition-all flex-shrink-0"
                 >
-                  <X className="w-3 h-3 text-gray-400" />
+                  <X className="w-3 h-3 text-gray-500 dark:text-gray-300" strokeWidth={3} />
                 </button>
               )}
             </div>
 
-            {/* Smart Search Suggestions Drawer - 3 Sections with Underlined Text */}
             {showSuggestions && (trendingNow.length > 0 || hotKeywords.length > 0 || hotSources.length > 0) && !searchInput && (
               <div className="absolute top-full left-0 w-full mt-2 bg-white/95 dark:bg-[#1e1e1e]/95 backdrop-blur-md rounded-xl shadow-lg border border-gray-100 dark:border-white/5 p-3 animate-in slide-in-from-top-2 fade-in duration-200 z-50 max-w-xl">
-
-                {/* SECTION 1: Trending Now (Manual) */}
                 {trendingNow.length > 0 && (
                   <div className="mb-2.5">
                     <div className="text-[10px] uppercase tracking-wider text-gray-400 mb-1.5 flex items-center gap-1">
@@ -433,12 +408,10 @@ export default function Home() {
                   </div>
                 )}
 
-                {/* Divider 1 */}
                 {trendingNow.length > 0 && hotKeywords.length > 0 && (
                   <div className="border-t border-gray-200 dark:border-gray-700 my-2.5"></div>
                 )}
 
-                {/* SECTION 2: Hot Topics (Auto, 15 results) */}
                 {hotKeywords.length > 0 && (
                   <div className="mb-2.5">
                     <div className="text-[10px] uppercase tracking-wider text-gray-400 mb-1.5">
@@ -460,12 +433,10 @@ export default function Home() {
                   </div>
                 )}
 
-                {/* Divider 2 */}
                 {hotKeywords.length > 0 && hotSources.length > 0 && (
                   <div className="border-t border-gray-200 dark:border-gray-700 my-2.5"></div>
                 )}
 
-                {/* SECTION 3: Hot Sources (Auto, 10 results) */}
                 {hotSources.length > 0 && (
                   <div>
                     <div className="text-[10px] uppercase tracking-wider text-gray-400 mb-1.5">
@@ -490,7 +461,6 @@ export default function Home() {
             )}
           </div>
 
-          {/* Archive Button - Right */}
           <button
             type="button"
             onClick={() => setShowArchiveDrawer(!showArchiveDrawer)}
@@ -503,11 +473,9 @@ export default function Home() {
           </button>
         </div>
 
-        {/* CategoryNav */}
         <CategoryNav currentFilter={currentFilter} onFilterChange={handleFilterChange} />
       </Header>
 
-      {/* Archive Drawer - Animated Wrapper */}
       <div
         className={`
           relative z-50 overflow-hidden transition-all duration-300 ease-in-out bg-white dark:bg-[#121212] border-b border-gray-100 dark:border-gray-800
@@ -521,7 +489,6 @@ export default function Home() {
         />
       </div>
 
-      {/* Backdrop for Archive Drawer */}
       {showArchiveDrawer && (
         <div
           className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[2px] animate-in fade-in duration-200"
@@ -530,7 +497,6 @@ export default function Home() {
         />
       )}
 
-      {/* Content Module */}
       <main className="max-w-[600px] mx-auto pb-10 relative z-30 mt-4">
         <NewsList
           news={displayItems}
@@ -542,7 +508,6 @@ export default function Home() {
           archiveData={archiveData}
         />
 
-        {/* Empty state */}
         {!isLoading && searchQuery && filteredItems.length === 0 && (
           <div className="px-4 py-16 text-center">
             <p className="text-base text-gray-500 dark:text-gray-400">
@@ -551,7 +516,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* Loading more */}
         {!isLoading && visibleCount < filteredItems.length && (
           <div className="text-center py-8 text-[var(--text-sub)] text-sm">
             Loading...
@@ -561,7 +525,6 @@ export default function Home() {
 
       <BackToTop />
 
-      {/* Modals */}
       <SettingsModal
         isOpen={showSettings}
         onClose={() => setShowSettings(false)}
@@ -585,7 +548,6 @@ export default function Home() {
         currentFilter={currentFilter}
       />
 
-      {/* Search Suggestions Backdrop - Low z-index to stay behind Header (z-50) but cover content */}
       {showSuggestions && (trendingNow.length > 0 || hotKeywords.length > 0 || hotSources.length > 0) && !searchInput && (
         <div
           className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm animate-in fade-in duration-200"
