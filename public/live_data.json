@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-12-02T13:36:08+09:00",
+  "lastUpdated": "2025-12-02T14:06:46.376899",
   "streams": [
     {
       "id": "shibuya",
@@ -14,37 +14,37 @@
       "id": "tokyo_bay",
       "displayName": "东京湾24小时直播",
       "channelName": "東京風景",
-      "isLive": false,
-      "videoId": null,
-      "title": null,
-      "matchScore": 0
+      "isLive": true,
+      "videoId": "_k-5U7IeK8g",
+      "title": "LIVE from Tokyo — 24/7 City Views | Chat, Relax, and Win a Postcard from Japan 🇯🇵 (w 🎄Winter Music)",
+      "matchScore": 4
     },
     {
       "id": "asakusa",
       "displayName": "浅草寺24小时直播",
       "channelName": "浅草中屋チャンネル",
-      "isLive": false,
-      "videoId": null,
-      "title": null,
-      "matchScore": 0
+      "isLive": true,
+      "videoId": "LHPKP8PP6QY",
+      "title": "【LIVE CAMERA】浅草ライブカメラ「浅草寺 宝蔵門」（浅草中屋  屋上より）",
+      "matchScore": 5
     },
     {
       "id": "shinjuku",
       "displayName": "新宿歌舞伎町24小时直播",
       "channelName": "テイケイ公式チャンネル",
-      "isLive": false,
-      "videoId": null,
-      "title": null,
-      "matchScore": 0
+      "isLive": true,
+      "videoId": "ErHJBXTmm2Q",
+      "title": "【24Ｈ：LIVE】東京 新宿 歌舞伎町 交差点 ライブカメラ  / Tokyo  Shinjuku Kabukicho Live Camera【テイケイ屋上カメラ】　#靖国通り #４K #歌舞伎町",
+      "matchScore": 5
     },
     {
       "id": "fujisan",
       "displayName": "富士山忍野八海24小时直播",
       "channelName": "FujiyamaTV - FujigokoTV",
-      "isLive": false,
-      "videoId": null,
-      "title": null,
-      "matchScore": 0
+      "isLive": true,
+      "videoId": "sm3xXTfDtGE",
+      "title": "富士山ライブカメラ(忍野八海から)[4K] - [4K]Mount Fuji webcams (Oshino Hakkai) from Japan. 【LiveFujigokoTV】",
+      "matchScore": 2
     }
   ]
 }
