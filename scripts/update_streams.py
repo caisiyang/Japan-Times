@@ -10,21 +10,35 @@ yt_token = os.environ.get("YOUTUBE_" + "API_KEY")
 target_channel_id = os.environ.get("YOUTUBE_" + "CHANNEL_ID")
 OUTPUT_FILE = "public/live_data.json"
 
-# 🎯 关键修改：我们要找的关键词
-# 只要标题里包含这些词，就认为是我们要的目标
-TARGET_KEYWORDS = ["渋谷", "Shibuya", "Scramble"]
+# 🎯 关键修改：我们要找的关键词（按优先级排序）
+# 包含这些关键词越多，优先级越高
+TARGET_KEYWORDS = ["渋谷", "Shibuya", "Scramble", "スクランブル"]
+
+def calculate_match_score(title):
+    """
+    计算标题的匹配分数，包含的关键词越多分数越高
+    """
+    score = 0
+    title_lower = title.lower()  # 转为小写进行不区分大小写的匹配
+    
+    for keyword in TARGET_KEYWORDS:
+        if keyword.lower() in title_lower:
+            score += 1
+    
+    return score
 
 def get_live_stream_id(api_key, channel_id):
     try:
         youtube = build("youtube", "v3", developerKey=api_key)
 
-        # 1. 获取该频道下所有的直播（把数量 maxResults 提高到 5，防止涩谷排在后面）
+        # 1. 获取该频道下所有的直播（提高到 10 个结果，确保不遗漏）
+        print(f"🔍 Searching for live streams on channel: {channel_id}...")
         request = youtube.search().list(
             part="id,snippet",
             channelId=channel_id,
             eventType="live",
             type="video",
-            maxResults=5 
+            maxResults=10  # 提高到 10 个
         )
         response = request.execute()
         items = response.get("items", [])
@@ -33,43 +47,56 @@ def get_live_stream_id(api_key, channel_id):
             print("⚠️ No live stream found on this channel.")
             return create_empty_data()
 
-        # 2. 遍历结果，寻找包含关键词的视频
-        selected_video = None
+        print(f"\n📺 Found {len(items)} active streams:")
+        print("=" * 80)
         
-        print(f"🔍 Found {len(items)} active streams. Filtering for keywords: {TARGET_KEYWORDS}...")
-
-        for video in items:
+        # 2. 为每个视频计算匹配分数
+        scored_videos = []
+        for i, video in enumerate(items, 1):
             title = video["snippet"]["title"]
-            print(f"   - Checking: {title}")
+            video_id = video["id"]["videoId"]
+            score = calculate_match_score(title)
             
-            # 检查标题是否包含任一关键词
-            for keyword in TARGET_KEYWORDS:
-                if keyword in title:
-                    selected_video = video
-                    print(f"   ✅ Match found! ('{keyword}' in title)")
-                    break
+            scored_videos.append({
+                "video": video,
+                "title": title,
+                "video_id": video_id,
+                "score": score
+            })
             
-            if selected_video:
-                break
+            # 打印每个视频的信息
+            print(f"{i}. {title}")
+            print(f"   Video ID: {video_id}")
+            print(f"   Match Score: {score} {'⭐' * score}")
+            print()
 
-        # 3. 如果没找到涩谷，就拿第一个（比如新闻）做保底，或者你可以选择返回空
-        if not selected_video:
-            print("⚠️ 没找到涩谷直播，使用第一个可用的直播作为替补。")
-            selected_video = items[0]
-
-        # 4. 提取数据
-        video_id = selected_video["id"]["videoId"]
-        title = selected_video["snippet"]["title"]
+        # 3. 按分数排序，选择分数最高的
+        scored_videos.sort(key=lambda x: x["score"], reverse=True)
+        
+        # 4. 选择最佳匹配
+        best_match = scored_videos[0]
+        
+        if best_match["score"] > 0:
+            print(f"✅ Selected (Best Match): {best_match['title']}")
+            print(f"   Match Score: {best_match['score']}")
+        else:
+            print(f"⚠️ No keyword matches found. Using first available stream as fallback:")
+            print(f"   {best_match['title']}")
+        
+        print("=" * 80)
         
         return {
             "isLive": True,
-            "videoId": video_id,
-            "title": title,
+            "videoId": best_match["video_id"],
+            "title": best_match["title"],
+            "matchScore": best_match["score"],
             "lastUpdated": datetime.datetime.now().isoformat()
         }
 
     except Exception as e:
         print(f"❌ An error occurred: {e}")
+        import traceback
+        traceback.print_exc()
         return {
             "isLive": False,
             "error": str(e),
@@ -88,13 +115,17 @@ def save_to_json(data, filename):
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
-    print(f"💾 Data saved to {filename}")
+    print(f"\n💾 Data saved to {filename}")
+    print(f"📄 Content: {json.dumps(data, indent=2, ensure_ascii=False)}")
 
 if __name__ == "__main__":
     if not yt_token or not target_channel_id:
         raise ValueError("❌ Error: Missing configuration secrets in GitHub!")
 
     print("🚀 Starting update script...")
+    print(f"🎯 Target Keywords: {TARGET_KEYWORDS}\n")
+    
     data = get_live_stream_id(yt_token, target_channel_id)
     save_to_json(data, OUTPUT_FILE)
-    print("✨ Done.")
+    
+    print("\n✨ Done.")
