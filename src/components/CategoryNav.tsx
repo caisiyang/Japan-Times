@@ -95,14 +95,14 @@ export default function CategoryNav({ currentFilter, onFilterChange }: CategoryN
   };
 
   return (
-    <div className="w-full sticky top-[114px] z-40 px-4 pb-3"
+    <div className="w-full sticky top-[130px] z-50 px-4 pb-3"
       onMouseEnter={handleInteractionStart}
       onMouseLeave={handleInteractionEnd}
       onTouchStart={handleInteractionStart}
       onTouchEnd={handleInteractionEnd}
     >
       <nav
-        className="max-w-[600px] mx-auto flex items-center h-12 px-4 
+        className="max-w-[600px] mx-auto flex items-center h-12 px-4 py-2 mt-3
                    bg-white/90 dark:bg-[#1e1e1e]/90 
                    backdrop-blur-xl 
                    border border-gray-200/50 dark:border-white/10

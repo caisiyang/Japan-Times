@@ -153,7 +153,7 @@ export default function Home() {
   const [pullStartX, setPullStartX] = useState(0);
   const [pullCurrentY, setPullCurrentY] = useState(0);
   const PULL_THRESHOLD = 80;
-  const SWIPE_THRESHOLD = 50;
+  // const SWIPE_THRESHOLD = 50; // Removed swipe threshold
 
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -248,21 +248,7 @@ export default function Home() {
   };
 
   const handleTouchEnd = async (e: React.TouchEvent) => {
-    const endX = e.changedTouches[0].clientX;
-    const diffX = endX - pullStartX;
-
-    // Horizontal Swipe Logic
-    if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(pullCurrentY) < 30) {
-      if (diffX > 0) {
-        // Swipe Right
-        if (activeTab === 'live') setActiveTab('news');
-        else if (activeTab === 'news') setActiveTab('live');
-      } else {
-        // Swipe Left
-        if (activeTab === 'news') setActiveTab('live');
-        else if (activeTab === 'live') setActiveTab('news');
-      }
-    }
+    // Removed Swipe Logic
 
     // Pull to Refresh Logic
     if (pullCurrentY > PULL_THRESHOLD) {
@@ -438,15 +424,15 @@ export default function Home() {
                 <div className="flex justify-between items-center gap-3 h-12">
                   <div
                     ref={searchContainerRef}
-                    className="flex-1 relative h-full"
+                    className="flex-1 relative h-full min-w-0"
                   >
-                    <div className="flex items-center gap-2 h-full bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-white/10 rounded-full px-4 shadow-md dark:shadow-none transition-all focus-within:ring-2 focus-within:ring-[var(--primary)] focus-within:border-transparent">
+                    <div className="flex items-center gap-2 h-full bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-white/10 rounded-xl px-4 shadow-md dark:shadow-none transition-all focus-within:ring-2 focus-within:ring-[var(--primary)] focus-within:border-transparent">
                       <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
                       <input
                         type="text"
                         value={searchInput}
                         placeholder={settings.lang === "sc" ? "搜索..." : "搜尋..."}
-                        className="flex-1 bg-transparent border-none focus:ring-0 placeholder-gray-400 text-gray-700 dark:text-gray-200 text-sm p-0 outline-none"
+                        className="flex-1 bg-transparent border-none focus:ring-0 placeholder-gray-400 text-gray-700 dark:text-gray-200 text-sm p-0 outline-none min-w-0"
                         onChange={(e) => handleSearchInput(e.target.value)}
                         onFocus={() => setShowSuggestions(true)}
                       />
@@ -537,7 +523,7 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={() => setShowArchiveDrawer(!showArchiveDrawer)}
-                    className="h-full px-5 rounded-full border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1e1e1e] text-sm font-medium text-[var(--text-main)] hover:border-[var(--primary)] hover:text-[var(--primary)] shadow-md dark:shadow-none transition-all whitespace-nowrap flex items-center gap-2"
+                    className="h-full px-5 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1e1e1e] text-sm font-medium text-[var(--text-main)] hover:border-[var(--primary)] hover:text-[var(--primary)] shadow-md dark:shadow-none transition-all whitespace-nowrap flex items-center gap-2 flex-shrink-0"
                   >
                     {settings.lang === "sc" ? "历史归档" : "歷史歸檔"}
                   </button>

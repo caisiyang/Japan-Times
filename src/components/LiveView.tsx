@@ -58,7 +58,36 @@ export default function LiveView() {
     if (!data) return null;
 
     return (
-        <div className="w-full max-w-[800px] mx-auto pb-20 animate-in fade-in duration-500">
+        <div className="w-full max-w-[600px] mx-auto pb-20 animate-in fade-in duration-500">
+
+
+
+
+
+
+            {/* Disclaimer */}
+            {/* 可关闭的直播提示横幅 */}
+<div className="relative mb-5">
+  <div className="px-5 py-3.5 bg-red-50/70 dark:bg-red-900/20 backdrop-blur-md rounded-2xl border border-red-200/50 dark:border-red-700/30">
+    <p className="text-center text-sm font-medium text-red-700 dark:text-red-300">
+      由于众所周知的原因，大陆用户无法观看youtube直播，非常遗憾但请理解
+    </p>
+  </div>
+  <button
+    onClick={(e) => e.currentTarget.parentElement?.remove()}
+    className="absolute top-2 right-2 p-1 rounded-full bg-black/10 dark:bg-white/10 hover:bg-black/20 dark:hover:bg-white/20 transition-all"
+  >
+    <svg className="w-3.5 h-3.5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  </button>
+</div>
+
+
+
+
+
+
             {/* Main Content Area */}
             <div className="flex flex-col gap-6">
 
