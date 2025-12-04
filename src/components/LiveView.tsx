@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import { Play, Wifi, Clock, ExternalLink, ChevronDown, MonitorPlay } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// R2 公开访问 URL
+const R2_PUBLIC_URL = process.env.NEXT_PUBLIC_R2_URL || "";
+
 interface StreamData {
     id: string;
     displayName: string;
@@ -34,7 +37,12 @@ export default function LiveView() {
     }, []);
 
     useEffect(() => {
-        fetch('/live_data.json')
+        // 从 R2 获取直播数据
+        const liveDataUrl = R2_PUBLIC_URL
+            ? `${R2_PUBLIC_URL}/live_data.json?t=${Date.now()}`
+            : `/live_data.json?t=${Date.now()}`;
+
+        fetch(liveDataUrl)
             .then((res) => res.json())
             .then((data: LiveData) => {
                 setData(data);
@@ -77,8 +85,6 @@ export default function LiveView() {
 
 
 
-
-
             {/* Disclaimer */}
             {/* 可关闭的直播提示横幅 */}
             {showWarning && (
@@ -98,8 +104,6 @@ export default function LiveView() {
                     </button>
                 </div>
             )}
-
-
 
 
 

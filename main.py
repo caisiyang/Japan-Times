@@ -7,9 +7,50 @@ import datetime
 import time
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
+import boto3
+from botocore.config import Config
 
 # 日本时间 (UTC+9)
 JST = datetime.timezone(datetime.timedelta(hours=9))
+
+# === R2 配置 ===
+R2_ACCOUNT_ID = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "")
+R2_ACCESS_KEY = os.environ.get("CLOUDFLARE_R2_ACCESS_KEY_ID", "")
+R2_SECRET_KEY = os.environ.get("CLOUDFLARE_R2_SECRET_ACCESS_KEY", "")
+R2_BUCKET_NAME = os.environ.get("R2_BUCKET_NAME", "cnjp-data")
+
+def get_r2_client():
+    """获取 R2 客户端"""
+    if not R2_ACCOUNT_ID or not R2_ACCESS_KEY or not R2_SECRET_KEY:
+        print("⚠️ R2 credentials not configured, skipping R2 upload")
+        return None
+    
+    return boto3.client(
+        's3',
+        endpoint_url=f'https://{R2_ACCOUNT_ID}.r2.cloudflarestorage.com',
+        aws_access_key_id=R2_ACCESS_KEY,
+        aws_secret_access_key=R2_SECRET_KEY,
+        config=Config(signature_version='s3v4'),
+        region_name='auto'
+    )
+
+def upload_to_r2(client, local_path, r2_key):
+    """上传文件到 R2"""
+    if client is None:
+        return False
+    try:
+        with open(local_path, 'rb') as f:
+            client.put_object(
+                Bucket=R2_BUCKET_NAME,
+                Key=r2_key,
+                Body=f.read(),
+                ContentType='application/json'
+            )
+        print(f"✅ Uploaded to R2: {r2_key}")
+        return True
+    except Exception as e:
+        print(f"❌ R2 upload failed for {r2_key}: {e}")
+        return False
 
 # === 媒体映射表 ===
 MEDIA_DOMAIN_MAP = {
@@ -79,7 +120,7 @@ WHITELIST_KEYWORDS = [
 ]
 
 def is_false_positive(title, source_name):
-    # 针对“中国新闻(Chugoku Shimbun)”媒体
+    # 针对"中国新闻(Chugoku Shimbun)"媒体
     if "中国新聞" in source_name:
         if not any(wk in title for wk in WHITELIST_KEYWORDS):
             return True
@@ -277,6 +318,10 @@ def update_news():
     total_added = 0
     total_ignored = 0
 
+    # 获取 R2 客户端
+    r2_client = get_r2_client()
+    uploaded_archives = []
+
     for date_key, items in news_by_date.items():
         file_path = os.path.join(archive_dir, f"{date_key}.json")
         existing_list = []
@@ -310,6 +355,10 @@ def update_news():
         
         with open(file_path, 'w', encoding='utf-8') as f:
             json.dump(final_list, f, ensure_ascii=False, indent=2)
+        
+        # 上传到 R2
+        upload_to_r2(r2_client, file_path, f"archive/{date_key}.json")
+        uploaded_archives.append(date_key)
             
         print(f"[{date_key}] 存档更新: 总{len(final_list)}条")
 
@@ -327,9 +376,13 @@ def update_news():
             except Exception as e:
                 print(f"读取 {filename} 失败: {e}")
     
-    with open(os.path.join(archive_dir, 'index.json'), 'w', encoding='utf-8') as f:
+    index_path = os.path.join(archive_dir, 'index.json')
+    with open(index_path, 'w', encoding='utf-8') as f:
         json.dump(archive_index, f, ensure_ascii=False, indent=2)
     print("归档索引生成完毕。")
+    
+    # 上传 index.json 到 R2
+    upload_to_r2(r2_client, index_path, "archive/index.json")
 
     # data.json 更新
     homepage_news = []
@@ -358,10 +411,16 @@ def update_news():
         "news": homepage_news
     }
     
-    with open('public/data.json', 'w', encoding='utf-8') as f:
+    data_json_path = 'public/data.json'
+    with open(data_json_path, 'w', encoding='utf-8') as f:
         json.dump(output_data, f, ensure_ascii=False, indent=2)
     
+    # 上传 data.json 到 R2
+    upload_to_r2(r2_client, data_json_path, "data.json")
+    
     print(f"全部完成！首页数据 data.json 已包含 {len(homepage_news)} 条新闻。")
+    if r2_client:
+        print(f"✅ R2 上传完成：data.json, archive/index.json, 及 {len(uploaded_archives)} 个日期存档")
 
 if __name__ == "__main__":
     update_news()

@@ -17,6 +17,9 @@ import { useTheme } from "@/components/ThemeContext";
 import { CATEGORY_MAP, CATEGORIES } from "@/lib/constants";
 import { motion, AnimatePresence } from "framer-motion";
 
+// R2 公开访问 URL
+const R2_PUBLIC_URL = process.env.NEXT_PUBLIC_R2_URL || "";
+
 export default function Home() {
   const { settings } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -177,8 +180,11 @@ export default function Home() {
   const fetchData = async (showLoading = true) => {
     if (showLoading) setIsLoading(true);
     try {
-      // Fetch latest news
-      const r = await fetch("/data.json?t=" + Date.now());
+      // 从 R2 获取最新新闻数据
+      const dataUrl = R2_PUBLIC_URL
+        ? `${R2_PUBLIC_URL}/data.json?t=${Date.now()}`
+        : `/data.json?t=${Date.now()}`;
+      const r = await fetch(dataUrl);
       const data = await r.json();
       if (data && data.news) {
         setRawNewsData(data.news);
@@ -187,9 +193,12 @@ export default function Home() {
         setRawNewsData(data);
       }
 
-      // Fetch archive index
+      // 从 R2 获取归档索引
       try {
-        const rIndex = await fetch("/archive/index.json?t=" + Date.now());
+        const indexUrl = R2_PUBLIC_URL
+          ? `${R2_PUBLIC_URL}/archive/index.json?t=${Date.now()}`
+          : `/archive/index.json?t=${Date.now()}`;
+        const rIndex = await fetch(indexUrl);
         if (rIndex.ok) {
           const indexData = await rIndex.json();
           setArchiveIndex(indexData);
@@ -371,7 +380,11 @@ export default function Home() {
 
     if (!archiveData[dateStr]) {
       try {
-        const r = await fetch(`/archive/${dateStr}.json`);
+        // 从 R2 获取归档数据
+        const archiveUrl = R2_PUBLIC_URL
+          ? `${R2_PUBLIC_URL}/archive/${dateStr}.json`
+          : `/archive/${dateStr}.json`;
+        const r = await fetch(archiveUrl);
         if (r.ok) {
           const items = await r.json();
           setArchiveData(prev => ({
