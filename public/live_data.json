@@ -1,22 +1,13 @@
 {
-  "lastUpdated": "2025-12-04T09:27:23.017234",
+  "lastUpdated": "2025-12-04T11:36:46.531341",
   "streams": [
     {
       "id": "shibuya",
-      "displayName": "涩谷街头直播",
+      "displayName": "涩谷交差点24小时直播",
       "channelName": "ANN News",
       "isLive": true,
       "videoId": "tujkoXI8rWM",
       "title": "【ライブ】渋谷スクランブル交差点 / Shibuya Scramble Crossing Live Camera【LIVE】ANN・テレ朝",
-      "matchScore": 4
-    },
-    {
-      "id": "tokyo_bay",
-      "displayName": "东京湾24小时直播",
-      "channelName": "東京風景",
-      "isLive": true,
-      "videoId": "_k-5U7IeK8g",
-      "title": "LIVE from Tokyo — 24/7 City Views | Chat, Relax, and Win a Postcard from Japan 🇯🇵 (w 🎄Winter Music)",
       "matchScore": 4
     },
     {
@@ -33,8 +24,8 @@
       "displayName": "新宿歌舞伎町24小时直播",
       "channelName": "テイケイ公式チャンネル",
       "isLive": true,
-      "videoId": "vuP9iwdyyFM",
-      "title": "【24Ｈ：LIVE】東京 新宿 歌舞伎町 第２（区役所交差点）ライブカメラ  / Tokyo  Shinjuku Kabukicho Live Camera【テイケイ屋上カメラ】　 #４K #歌舞伎町",
+      "videoId": "ErHJBXTmm2Q",
+      "title": "【24Ｈ：LIVE】東京 新宿 歌舞伎町 交差点 ライブカメラ  / Tokyo  Shinjuku Kabukicho Live Camera【テイケイ屋上カメラ】　#靖国通り #４K #歌舞伎町",
       "matchScore": 5
     },
     {
@@ -45,6 +36,24 @@
       "videoId": "sm3xXTfDtGE",
       "title": "富士山ライブカメラ(忍野八海から)[4K] - [4K]Mount Fuji webcams (Oshino Hakkai) from Japan. 【LiveFujigokoTV】",
       "matchScore": 2
+    },
+    {
+      "id": "osaka_night",
+      "displayName": "大阪全景24小时直播",
+      "channelName": "starstyle",
+      "isLive": true,
+      "videoId": "GCxs-DhQs08",
+      "title": "ライブ配信・夜景がきれい！あべのハルカス・大阪の夜景/JAPAN NIGHT VEW /Live streaming and beautiful night view! Osaka,Japan",
+      "matchScore": 4
+    },
+    {
+      "id": "tokyo_bay",
+      "displayName": "东京湾24小时直播",
+      "channelName": "東京風景",
+      "isLive": true,
+      "videoId": "zPfCPHQZvpw",
+      "title": "Tokyo Bay Live 24/7 | Christmas Edition 🎄 Relaxing Lofi &amp; City Lights",
+      "matchScore": 3
     }
   ]
 }
