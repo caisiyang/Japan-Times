@@ -32,7 +32,7 @@ export const CATEGORY_DOT_COLORS: Record<string, string> = {
     // ❌ 已删除 tech
     "sports": "bg-indigo-500",
     "other": "bg-gray-400",
-    "all": "bg-gray-900" 
+    "all": "bg-gray-900"
 };
 
 export const MEDIA_LOGOS: Record<string, string> = {
@@ -59,3 +59,25 @@ export const MEDIA_LOGOS: Record<string, string> = {
     "東洋経済": "https://toyokeizai.net/favicon.ico",
     "JBpress": "https://jbpress.ismedia.jp/favicon.ico"
 };
+
+// --- Bulletin Board Presets ---
+// --- Bulletin Board Presets ---
+export const BULLETIN_PRESETS = [
+    { sc: "兼听则明", tc: "兼聽則明" },
+    { sc: "保持独立思考", tc: "保持獨立思考" },
+    { sc: "换个角度看世界", tc: "換個角度看世界" },
+    { sc: "拒绝盲从，理性吃瓜", tc: "拒絕盲從，理性吃瓜" },
+    { sc: "日媒滤镜有点重", tc: "日媒濾鏡有點重" },
+    { sc: "愿世界和平", tc: "願世界和平" },
+    { sc: "一衣带水，和则两利", tc: "一衣帶水，和則兩利" },
+    { sc: "期待更多民间交流", tc: "期待更多民間交流" },
+    { sc: "合作共赢才是硬道理", tc: "合作共贏才是硬道理" },
+    { sc: "文化无国界", tc: "文化無國界" },
+    { sc: "祖国越来越强大", tc: "祖國越來越強大" },
+    { sc: "中国速度，点赞！", tc: "中國速度，點讚！" }
+];
+
+export const SYSTEM_BULLETINS = [
+    { id: "sys-1", content: "欢迎来到 CNJP News", isSystem: true },
+    { id: "sys-2", content: "点击右侧“发声”按钮参与讨论", isSystem: true },
+];

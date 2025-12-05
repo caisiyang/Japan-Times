@@ -659,192 +659,192 @@ export default function Home() {
               {/* CategoryNav - 吸顶 */}
               <CategoryNav currentFilter={currentFilter} onFilterChange={handleFilterChange} />
 
-              {/* Search & Archive Bar - 固定高度和间距 */}
-              <div className="px-4 pb-3 relative z-45">
-                {/* 新内容提醒 - 红色 */}
-                <AnimatePresence>
-                  {newContentCount > 0 && (
-                    <motion.button
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      onClick={loadNewContent}
-                      className="w-full mb-3 py-2.5 px-4 bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white text-sm font-medium rounded-xl shadow-lg shadow-red-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
-                    >
-                      <ArrowUpDown className="w-4 h-4" />
-                      {settings.lang === "sc"
-                        ? `有 ${newContentCount} 条新内容`
-                        : `有 ${newContentCount} 條新內容`}
-                    </motion.button>
-                  )}
-                </AnimatePresence>
+              <div className={`relative max-w-[600px] mx-auto px-4 ${showSuggestions ? "z-[60]" : "z-30"}`}>
+                {/* Search & Tool Bar - Master Standard Container */}
+                <div className="w-full max-w-[600px] h-[52px] mx-auto bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 flex items-center px-1 mt-2">
 
-                <div className="flex justify-between items-center gap-2 h-12">
-                  {/* 搜索框 - 缩短宽度 */}
-                  <div
-                    ref={searchContainerRef}
-                    className="flex-[2] relative h-full min-w-0"
-                  >
-                    <div className="flex items-center gap-2 h-full bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-white/10 rounded-xl px-4 shadow-md dark:shadow-none transition-all focus-within:ring-2 focus-within:ring-[var(--primary)] focus-within:border-transparent">
-                      <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                      <input
-                        type="text"
-                        value={searchInput}
-                        placeholder={settings.lang === "sc" ? "搜索全部新闻..." : "搜尋全部新聞..."}
-                        className="flex-1 bg-transparent border-none focus:ring-0 placeholder-gray-400 text-gray-700 dark:text-gray-200 text-sm p-0 outline-none min-w-0"
-                        onChange={(e) => handleSearchInput(e.target.value)}
-                        onFocus={() => setShowSuggestions(true)}
-                      />
-                      {isSearchingAll && (
-                        <Loader2 className="w-4 h-4 text-gray-400 animate-spin flex-shrink-0" />
-                      )}
-                      {searchInput && (
-                        <button
-                          onClick={handleClearSearch}
-                          title="Clear search"
-                          className="w-5 h-5 flex items-center justify-center rounded-full bg-gray-200 dark:bg-white/10 hover:bg-gray-300 dark:hover:bg-white/20 hover:scale-110 active:scale-95 transition-all flex-shrink-0"
-                        >
-                          <X className="w-3 h-3 text-gray-500 dark:text-gray-300" strokeWidth={3} />
-                        </button>
-                      )}
+                  {/* Left: Search Input */}
+                  <div className="flex-1 flex items-center h-full px-3 gap-2">
+                    <Search className="w-5 h-5 text-gray-400 shrink-0" />
+                    <input
+                      ref={input => {
+                        // @ts-ignore
+                        searchContainerRef.current = input?.parentElement;
+                      }}
+                      type="text"
+                      value={searchInput}
+                      onChange={(e) => handleSearchInput(e.target.value)}
+                      onFocus={() => setShowSuggestions(true)}
+                      placeholder={settings.lang === "sc" ? "搜寻全部新闻..." : "搜尋全部新聞..."}
+                      className="w-full h-full bg-transparent border-none outline-none text-[15px] placeholder:text-gray-400 text-gray-700 dark:text-gray-200"
+                    />
+                    {isSearchingAll && (
+                      <Loader2 className="w-4 h-4 text-gray-400 animate-spin shrink-0" />
+                    )}
+                    {searchInput && (
+                      <button onClick={handleClearSearch}>
+                        <X className="w-4 h-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" />
+                      </button>
+                    )}
+
+                  </div>
+
+                  {/* Divider */}
+                  <div className="w-[1px] h-6 bg-gray-200 dark:bg-white/10 shrink-0" />
+
+                  {/* Right: Tools (Archive & Sort) */}
+                  <div className="flex items-center gap-1 pl-1 pr-1 shrink-0">
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowArchiveDrawer(true)}
+                        className="flex items-center justify-center gap-1.5 px-3 h-[40px] rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 text-gray-600 dark:text-gray-400 transition-colors"
+                      >
+                        <Calendar className="w-4 h-4" />
+                        <span className="text-[13px] font-medium">{settings.lang === "sc" ? "存档" : "存檔"}</span>
+                      </button>
+                      <AnimatePresence>
+                        {showArchiveDrawer && (
+                          <div className="absolute top-full right-1/2 translate-x-1/2 mt-2 w-72 z-50">
+                            <ArchiveDrawer
+                              archiveData={archiveData}
+                              archiveIndex={archiveIndex}
+                              onSelectDate={handleShowArchive}
+                              isOpen={showArchiveDrawer}
+                            />
+                          </div>
+                        )}
+                      </AnimatePresence>
                     </div>
 
-                    {showSuggestions && (trendingNow.length > 0 || hotKeywords.length > 0 || hotSources.length > 0) && !searchInput && (
-                      <div className="absolute top-full left-0 w-full mt-2 bg-white/95 dark:bg-[#1e1e1e]/95 backdrop-blur-md rounded-xl shadow-lg border border-gray-100 dark:border-white/5 p-3 animate-in slide-in-from-top-2 fade-in duration-200 z-50 max-w-xl">
-                        {trendingNow.length > 0 && (
-                          <div className="mb-2.5">
-                            <div className="text-[10px] uppercase tracking-wider text-gray-400 mb-1.5 flex items-center gap-1">
-                              {settings.lang === "sc" ? "当下最热" : "當下最熱"}
-                              <Flame className="w-3 h-3 text-red-500 fill-red-500" />
-                            </div>
-                            <div className="leading-relaxed text-sm">
-                              {trendingNow.map((keyword, index) => (
-                                <span key={keyword}>
-                                  <button
-                                    onClick={() => handleSuggestionClick(keyword)}
-                                    className="text-gray-800 dark:text-gray-200 text-[13px] underline decoration-gray-300 dark:decoration-gray-600 underline-offset-2 hover:text-red-500 hover:decoration-red-500 dark:hover:text-red-400 dark:hover:decoration-red-400 transition-colors font-medium"
-                                  >
-                                    {settings.lang === "sc" ? keyword : (TC_MAP[keyword] || keyword)}
-                                  </button>
-                                  {index < trendingNow.length - 1 && <span className="text-gray-300 dark:text-gray-600 mx-2">·</span>}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
+                    <button
+                      onClick={toggleSortMode}
+                      className={`flex items-center justify-center gap-1.5 px-3 h-[40px] rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition-colors ${sortMode === 'fetch' ? 'text-[var(--primary)] font-bold' : 'text-gray-600 dark:text-gray-400'}`}
+                    >
+                      <ArrowUpDown className={`w-4 h-4 ${sortMode === 'fetch' ? 'text-[var(--primary)]' : ''}`} />
+                      <span className="text-[13px] font-medium">{settings.lang === "sc" ? "排序" : "排序"}</span>
+                    </button>
+                  </div>
+                </div>
 
-                        {trendingNow.length > 0 && hotKeywords.length > 0 && (
-                          <div className="mb-2.5">
-                            <div className="text-[10px] uppercase tracking-wider text-gray-400 mb-1.5">
-                              {settings.lang === "sc" ? "热门话题" : "熱門話題"}
-                            </div>
-                            <div className="leading-relaxed">
-                              {hotKeywords.map((keyword, index) => (
-                                <span key={keyword}>
-                                  <button
-                                    onClick={() => handleSuggestionClick(keyword)}
-                                    className="text-gray-700 dark:text-gray-300 text-[12px] underline decoration-gray-300 dark:decoration-gray-600 underline-offset-2 hover:text-red-500 hover:decoration-red-500 dark:hover:text-red-400 dark:hover:decoration-red-400 transition-colors"
-                                  >
-                                    {keyword}
-                                  </button>
-                                  {index < hotKeywords.length - 1 && <span className="text-gray-300 dark:text-gray-600 mx-1.5">·</span>}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
+                {/* Smart Suggestions Dropdown - Moved Outside for Overflow Visibility */}
+                {showSuggestions && (trendingNow.length > 0 || hotKeywords.length > 0 || hotSources.length > 0) && !searchInput && (
+                  <div className="absolute top-[65px] left-4 right-4 w-auto bg-white/95 dark:bg-[#1e1e1e]/95 backdrop-blur-md rounded-xl shadow-lg border border-gray-100 dark:border-white/5 p-3 animate-in slide-in-from-top-2 fade-in duration-200 z-50">
+                    {trendingNow.length > 0 && (
+                      <div className="mb-2.5">
+                        <div className="text-[10px] uppercase tracking-wider text-gray-400 mb-1.5 flex items-center gap-1">
+                          {settings.lang === "sc" ? "当下最热" : "當下最熱"}
+                          <Flame className="w-3 h-3 text-red-500 fill-red-500" />
+                        </div>
+                        <div className="leading-relaxed text-sm">
+                          {trendingNow.map((keyword, index) => (
+                            <span key={keyword}>
+                              <button
+                                onClick={() => handleSuggestionClick(keyword)}
+                                className="text-gray-800 dark:text-gray-200 text-[13px] underline decoration-gray-300 dark:decoration-gray-600 underline-offset-2 hover:text-red-500 hover:decoration-red-500 dark:hover:text-red-400 dark:hover:decoration-red-400 transition-colors font-medium"
+                              >
+                                {settings.lang === "sc" ? keyword : (TC_MAP[keyword] || keyword)}
+                              </button>
+                              {index < trendingNow.length - 1 && <span className="text-gray-300 dark:text-gray-600 mx-2">·</span>}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
-                        {hotKeywords.length > 0 && hotSources.length > 0 && (
-                          <div className="border-t border-gray-200 dark:border-gray-700 my-2.5"></div>
-                        )}
+                    {trendingNow.length > 0 && hotKeywords.length > 0 && (
+                      <div className="mb-2.5">
+                        <div className="text-[10px] uppercase tracking-wider text-gray-400 mb-1.5">
+                          {settings.lang === "sc" ? "热门话题" : "熱門話題"}
+                        </div>
+                        <div className="leading-relaxed">
+                          {hotKeywords.map((keyword, index) => (
+                            <span key={keyword}>
+                              <button
+                                onClick={() => handleSuggestionClick(keyword)}
+                                className="text-gray-700 dark:text-gray-300 text-[12px] underline decoration-gray-300 dark:decoration-gray-600 underline-offset-2 hover:text-red-500 hover:decoration-red-500 dark:hover:text-red-400 dark:hover:decoration-red-400 transition-colors"
+                              >
+                                {keyword}
+                              </button>
+                              {index < hotKeywords.length - 1 && <span className="text-gray-300 dark:text-gray-600 mx-1.5">·</span>}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
-                        {hotSources.length > 0 && (
-                          <div>
-                            <div className="text-[10px] uppercase tracking-wider text-gray-400 mb-1.5">
-                              {settings.lang === "sc" ? "热门来源" : "熱門來源"}
-                            </div>
-                            <div className="leading-relaxed">
-                              {hotSources.map((source, index) => (
-                                <span key={source}>
-                                  <button
-                                    onClick={() => handleSuggestionClick(source)}
-                                    className="text-gray-600 dark:text-gray-400 text-[11px] underline decoration-gray-300 dark:decoration-gray-600 underline-offset-2 hover:text-red-500 hover:decoration-red-500 dark:hover:text-red-400 dark:hover:decoration-red-400 transition-colors"
-                                  >
-                                    {source}
-                                  </button>
-                                  {index < hotSources.length - 1 && <span className="text-gray-300 dark:text-gray-600 mx-1.5">·</span>}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
+                    {hotKeywords.length > 0 && hotSources.length > 0 && (
+                      <div className="border-t border-gray-200 dark:border-gray-700 my-2.5"></div>
+                    )}
+
+                    {hotSources.length > 0 && (
+                      <div>
+                        <div className="text-[10px] uppercase tracking-wider text-gray-400 mb-1.5">
+                          {settings.lang === "sc" ? "热门来源" : "熱門來源"}
+                        </div>
+                        <div className="leading-relaxed">
+                          {hotSources.map((source, index) => (
+                            <span key={source}>
+                              <button
+                                onClick={() => handleSuggestionClick(source)}
+                                className="text-gray-600 dark:text-gray-400 text-[11px] underline decoration-gray-300 dark:decoration-gray-600 underline-offset-2 hover:text-red-500 hover:decoration-red-500 dark:hover:text-red-400 dark:hover:decoration-red-400 transition-colors"
+                              >
+                                {source}
+                              </button>
+                              {index < hotSources.length - 1 && <span className="text-gray-300 dark:text-gray-600 mx-1.5">·</span>}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
-
-                  {/* 存档按钮 */}
-                  <button
-                    type="button"
-                    onClick={() => setShowArchiveDrawer(!showArchiveDrawer)}
-                    className="h-full px-4 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1e1e1e] text-sm font-medium text-[var(--text-main)] hover:border-[var(--primary)] hover:text-[var(--primary)] shadow-md dark:shadow-none transition-all whitespace-nowrap flex items-center gap-1.5 flex-shrink-0"
-                  >
-                    <Calendar className="w-4 h-4" />
-                    {settings.lang === "sc" ? "存档" : "存檔"}
-                  </button>
-
-                  {/* 排序按钮 - 经典排序图标 */}
-                  <button
-                    type="button"
-                    onClick={toggleSortMode}
-                    className={`h-full px-4 rounded-xl border text-sm font-medium shadow-md dark:shadow-none transition-all whitespace-nowrap flex items-center gap-1.5 flex-shrink-0 ${sortMode === 'fetch'
-                      ? 'border-[var(--primary)] bg-[var(--primary)]/10 text-[var(--primary)]'
-                      : 'border-gray-200 dark:border-white/10 bg-white dark:bg-[#1e1e1e] text-[var(--text-main)] hover:border-[var(--primary)] hover:text-[var(--primary)]'
-                      }`}
-                  >
-                    <ArrowUpDown className="w-4 h-4" />
-                    {settings.lang === "sc" ? "排序" : "排序"}
-                  </button>
-                </div>
-
-                {/* 搜索结果提示 */}
-                {searchQuery && (
-                  <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                    {isSearchingAll ? (
-                      <span className="flex items-center gap-1">
-                        <Loader2 className="w-3 h-3 animate-spin" />
-                        {settings.lang === "sc" ? "正在搜索全部新闻..." : "正在搜尋全部新聞..."}
-                      </span>
-                    ) : (
-                      <span>
-                        {settings.lang === "sc"
-                          ? `在 ${allNewsData.length || rawNewsData.length} 条新闻中找到 ${filteredItems.length} 条结果`
-                          : `在 ${allNewsData.length || rawNewsData.length} 條新聞中找到 ${filteredItems.length} 條結果`}
-                      </span>
-                    )}
-                  </div>
                 )}
-
-                {/* Archive Drawer Overlay */}
-                <AnimatePresence>
-                  {showArchiveDrawer && (
-                    <div className="absolute top-full left-0 w-full z-50 px-4 mt-2">
-                      <ArchiveDrawer
-                        archiveData={archiveData}
-                        archiveIndex={archiveIndex}
-                        onSelectDate={handleShowArchive}
-                        isOpen={showArchiveDrawer}
-                      />
-                    </div>
-                  )}
-                </AnimatePresence>
               </div>
 
-              {/* 新闻列表 - 带动画 */}
+              {/* 搜索结果提示 */}
+              {searchQuery && (
+                <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 text-center">
+                  {isSearchingAll ? (
+                    <span className="flex items-center justify-center gap-1">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      {settings.lang === "sc" ? "正在搜索全部新闻..." : "正在搜尋全部新聞..."}
+                    </span>
+                  ) : (
+                    <span>
+                      {settings.lang === "sc"
+                        ? `在 ${allNewsData.length || rawNewsData.length} 条新闻中找到 ${filteredItems.length} 条结果`
+                        : `在 ${allNewsData.length || rawNewsData.length} 條新聞中找到 ${filteredItems.length} 條結果`}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* New Content Notification - Red */}
+              <AnimatePresence>
+                {newContentCount > 0 && (
+                  <motion.button
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    onClick={loadNewContent}
+                    className="w-full mt-3 mb-1 py-2.5 px-4 bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white text-sm font-medium rounded-xl shadow-lg shadow-red-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                  >
+                    <ArrowUpDown className="w-4 h-4" />
+                    {settings.lang === "sc"
+                      ? `有 ${newContentCount} 条新内容`
+                      : `有 ${newContentCount} 條新內容`}
+                  </motion.button>
+                )}
+              </AnimatePresence>
+
+
+
+              {/* News List */}
               <motion.div
                 key={`${sortMode}-${searchQuery}`}
                 initial={{ opacity: 0.8, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
+                className="mt-3"
               >
                 <NewsList
                   news={displayItems}
@@ -857,6 +857,7 @@ export default function Home() {
                 />
               </motion.div>
 
+              {/* Empty State */}
               {!isLoading && searchQuery && filteredItems.length === 0 && !isSearchingAll && (
                 <div className="px-4 py-16 text-center">
                   <p className="text-base text-gray-500 dark:text-gray-400">
@@ -865,6 +866,7 @@ export default function Home() {
                 </div>
               )}
 
+              {/* Loading State */}
               {!isLoading && visibleCount < filteredItems.length && (
                 <div className="text-center py-8 text-[var(--text-sub)] text-sm">
                   Loading...
@@ -912,6 +914,8 @@ export default function Home() {
         onToggleFav={handleToggleFav}
         currentFilter={currentFilter}
       />
+
+
 
       {/* 隐形遮罩层:用于点击空白处关闭弹窗 */}
       {showSuggestions && (trendingNow.length > 0 || hotKeywords.length > 0 || hotSources.length > 0) && !searchInput && (

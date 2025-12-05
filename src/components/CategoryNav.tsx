@@ -14,7 +14,7 @@ export default function CategoryNav({ currentFilter, onFilterChange }: CategoryN
   const { settings } = useTheme();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
-  const [isStopped, setIsStopped] = useState(false);
+  const [isStopped, setIsStopped] = useState(true);
   const animationRef = useRef<number | null>(null);
   const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -95,18 +95,14 @@ export default function CategoryNav({ currentFilter, onFilterChange }: CategoryN
   };
 
   return (
-    <div className="w-full sticky top-[130px] z-50 px-4 pb-3"
+    <div className="w-full sticky top-[200px] z-50 px-4 pb-1"
       onMouseEnter={handleInteractionStart}
       onMouseLeave={handleInteractionEnd}
       onTouchStart={handleInteractionStart}
       onTouchEnd={handleInteractionEnd}
     >
       <nav
-        className="max-w-[600px] mx-auto flex items-center h-12 px-4 py-2 mt-3
-                   bg-white/90 dark:bg-[#1e1e1e]/90 
-                   backdrop-blur-xl 
-                   border border-gray-200/50 dark:border-white/10
-                   shadow-md dark:shadow-none rounded-xl overflow-hidden"
+        className="w-full max-w-[600px] h-[52px] mx-auto bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 flex items-center px-1 mt-3 overflow-hidden"
       >
         {/* Container with mask to fade edges */}
         <div
@@ -128,7 +124,7 @@ export default function CategoryNav({ currentFilter, onFilterChange }: CategoryN
                     relative flex items-center gap-1.5 text-[13px] font-medium transition-all duration-200 
                     whitespace-nowrap flex-shrink-0 px-3.5 py-1.5 rounded-full
                     ${isActive
-                      ? "bg-gray-800 dark:bg-white text-white dark:text-gray-900 shadow-md scale-105 font-bold"
+                      ? "bg-gray-800 dark:bg-white text-white dark:text-gray-900 shadow-md font-bold"
                       : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 active:scale-95"
                     }
                   `}

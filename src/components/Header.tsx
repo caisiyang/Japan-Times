@@ -5,6 +5,7 @@ import { Settings, Info, Heart, Tv, Sparkles, Newspaper, X } from "lucide-react"
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import BulletinBoard from "./BulletinBoard";
 
 interface HeaderProps {
   onOpenFav: () => void;
@@ -169,17 +170,19 @@ export default function Header({
             </div>
           </div>
 
-          {/* Tab Bar */}
-          <div className="relative flex items-center p-1 bg-gray-100 dark:bg-white/10 rounded-xl">
+          <BulletinBoard />
+
+          {/* Tab Bar - Master Standard Container */}
+          <div className="w-full max-w-[600px] h-[52px] mx-auto bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 flex items-center px-1 mt-3 overflow-hidden">
 
             <button
               onClick={() => onTabChange('news')}
-              className="relative flex-1 flex items-center justify-center py-2 text-sm font-medium transition-colors duration-200 z-10"
+              className="relative flex-1 h-[42px] flex items-center justify-center text-sm font-medium transition-colors duration-200 z-10"
             >
               {activeTab === 'news' && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute inset-0 bg-white dark:bg-[#121212] rounded-lg shadow-sm"
+                  className="absolute inset-0 bg-gray-100 dark:bg-white/10 rounded-xl"
                   transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                 />
               )}
@@ -191,12 +194,12 @@ export default function Header({
 
             <button
               onClick={() => onTabChange('live')}
-              className="relative flex-1 flex items-center justify-center py-2 text-sm font-medium transition-colors duration-200 z-10"
+              className="relative flex-1 h-[42px] flex items-center justify-center text-sm font-medium transition-colors duration-200 z-10"
             >
               {activeTab === 'live' && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute inset-0 bg-white dark:bg-[#121212] rounded-lg shadow-sm"
+                  className="absolute inset-0 bg-gray-100 dark:bg-white/10 rounded-xl"
                   transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                 />
               )}
