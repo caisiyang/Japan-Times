@@ -104,10 +104,10 @@ export default function CategoryNav({ currentFilter, onFilterChange }: CategoryN
       <nav
         className="w-full max-w-[600px] h-[52px] mx-auto bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 flex items-center px-1 mt-3 overflow-hidden"
       >
-        {/* Container with mask to fade edges */}
+        {/* Container */}
         <div
           ref={scrollRef}
-          className="relative flex-1 overflow-x-auto no-scrollbar mask-linear-fade"
+          className="relative flex-1 overflow-x-auto no-scrollbar"
           style={{ scrollBehavior: isStopped ? 'smooth' : 'auto' }}
         >
           <div className="flex items-center h-full gap-2.5 w-max px-2 py-2">
@@ -170,10 +170,6 @@ export default function CategoryNav({ currentFilter, onFilterChange }: CategoryN
         .no-scrollbar {
           -ms-overflow-style: none;
           scrollbar-width: none;
-        }
-        .mask-linear-fade {
-          -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-          mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
         }
       `}</style>
     </div>

@@ -44,11 +44,12 @@ export default function BulletinBoard() {
     const [sending, setSending] = useState(false);
     const [cooldownRemaining, setCooldownRemaining] = useState(0);
 
-    // Scrolling state (same as CategoryNav)
+    // Scrolling state
     const scrollRef = useRef<HTMLDivElement>(null);
     const [isPaused, setIsPaused] = useState(false);
     const animationRef = useRef<number | null>(null);
     const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const lastTimeRef = useRef<number>(0);
 
     // Initial Load
     useEffect(() => {
@@ -75,20 +76,25 @@ export default function BulletinBoard() {
         return () => clearInterval(timer);
     }, [cooldownRemaining]);
 
-    // Auto-scroll animation (same speed as CategoryNav: 0.5px per frame)
+    // Auto-scroll animation using timestamp for consistent speed
     useEffect(() => {
         const scrollContainer = scrollRef.current;
         if (!scrollContainer) return;
 
-        const scrollSpeed = 0.5; // Same as CategoryNav
+        const scrollSpeed = 30; // pixels per second
 
-        const animate = () => {
+        const animate = (timestamp: number) => {
+            if (!lastTimeRef.current) lastTimeRef.current = timestamp;
+            const deltaTime = timestamp - lastTimeRef.current;
+            lastTimeRef.current = timestamp;
+
             if (!isPaused && scrollContainer) {
-                scrollContainer.scrollLeft += scrollSpeed;
+                const scrollAmount = (scrollSpeed * deltaTime) / 1000;
+                scrollContainer.scrollLeft += scrollAmount;
 
                 // Infinite scroll logic
                 const oneSetWidth = scrollContainer.scrollWidth / 2;
-                if (scrollContainer.scrollLeft >= oneSetWidth) {
+                if (oneSetWidth > 0 && scrollContainer.scrollLeft >= oneSetWidth) {
                     scrollContainer.scrollLeft -= oneSetWidth;
                 }
             }
@@ -121,7 +127,6 @@ export default function BulletinBoard() {
             if (res.ok) {
                 const data = await res.json();
                 if (!Array.isArray(data) || data.length < 3) {
-                    // Add system messages if empty
                     const mixed = [...(Array.isArray(data) ? data : []), ...SYSTEM_BULLETINS];
                     const unique = mixed.filter((item, index, self) =>
                         index === self.findIndex((t) => t.id === item.id)
@@ -211,7 +216,6 @@ export default function BulletinBoard() {
     // Double the list for seamless infinite scroll
     const displayList = [...aggregatedList, ...aggregatedList];
 
-    // Helper to get present content
     const getPresetContent = (item: { sc: string, tc: string }) => {
         return settings.lang === 'tc' ? item.tc : item.sc;
     }
@@ -229,15 +233,14 @@ export default function BulletinBoard() {
                     </span>
                 </div>
 
-                {/* Scrollable Marquee Area */}
+                {/* Scrollable Marquee Area - NO MASK */}
                 <div
                     ref={scrollRef}
-                    className="flex-1 overflow-x-auto relative h-full flex items-center no-scrollbar mask-linear-fade"
+                    className="flex-1 overflow-x-auto relative h-full flex items-center no-scrollbar"
                     onMouseEnter={handleInteractionStart}
                     onMouseLeave={handleInteractionEnd}
                     onTouchStart={handleInteractionStart}
                     onTouchEnd={handleInteractionEnd}
-                    style={{ scrollBehavior: 'auto' }}
                 >
                     <div className="inline-flex items-center w-max px-2">
                         {displayList.map((item, i) => (
@@ -246,7 +249,7 @@ export default function BulletinBoard() {
                                 className="mx-4 text-[13px] whitespace-nowrap flex items-center gap-1.5"
                             >
                                 <span className={`w-1.5 h-1.5 rounded-full ${item.color} shrink-0`} />
-                                <span className="text-gray-600 dark:text-gray-300 font-medium max-w-[15em] truncate">
+                                <span className="text-gray-600 dark:text-gray-300 font-medium">
                                     {item.content}
                                 </span>
                                 {item.count > 1 && (
@@ -257,9 +260,6 @@ export default function BulletinBoard() {
                             </div>
                         ))}
                     </div>
-                    {/* Gradients */}
-                    <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-white dark:from-[#1e1e1e] to-transparent z-10 pointer-events-none" />
-                    <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-[#1e1e1e] to-transparent z-10 pointer-events-none" />
                 </div>
 
                 {/* Send Button */}
@@ -291,7 +291,6 @@ export default function BulletinBoard() {
                         className="bg-white dark:bg-[#202020] w-full max-w-sm rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200 border border-gray-100 dark:border-gray-700 max-h-[80vh] flex flex-col"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        {/* Header */}
                         <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
                             <h3 className="font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)]" />
@@ -305,7 +304,6 @@ export default function BulletinBoard() {
                             </button>
                         </div>
 
-                        {/* Content - Preset List */}
                         <div className="overflow-y-auto p-4 custom-scrollbar">
                             <div className="grid grid-cols-2 gap-2">
                                 {BULLETIN_PRESETS.map((item, i) => {
@@ -339,10 +337,6 @@ export default function BulletinBoard() {
                 .no-scrollbar {
                     -ms-overflow-style: none;
                     scrollbar-width: none;
-                }
-                .mask-linear-fade {
-                    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-                    mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
                 }
             `}</style>
         </div>

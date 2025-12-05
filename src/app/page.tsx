@@ -634,16 +634,19 @@ export default function Home() {
         onTabChange={setActiveTab}
       />
 
-      {/* --- Backdrop --- */}
+      {/* --- Backdrop for Archive Drawer OR Search Suggestions --- */}
       <div
         className={`
-          fixed inset-0 z-30 bg-black/20 backdrop-blur-[2px] transition-all duration-500
-          ${showArchiveDrawer
+          fixed inset-0 z-30 bg-black/20 backdrop-blur-[2px] transition-all duration-300
+          ${(showArchiveDrawer || showSuggestions)
             ? "opacity-100 visible pointer-events-auto"
             : "opacity-0 invisible pointer-events-none"
           }
         `}
-        onClick={() => setShowArchiveDrawer(false)}
+        onClick={() => {
+          setShowArchiveDrawer(false);
+          setShowSuggestions(false);
+        }}
       />
 
       <main className="max-w-[600px] mx-auto pb-10 relative">
@@ -674,7 +677,10 @@ export default function Home() {
                       type="text"
                       value={searchInput}
                       onChange={(e) => handleSearchInput(e.target.value)}
-                      onFocus={() => setShowSuggestions(true)}
+                      onFocus={() => {
+                        setShowSuggestions(true);
+                        setShowArchiveDrawer(false); // 互斥：关闭存档抽屉
+                      }}
                       placeholder={settings.lang === "sc" ? "搜寻全部新闻..." : "搜尋全部新聞..."}
                       className="w-full h-full bg-transparent border-none outline-none text-[15px] placeholder:text-gray-400 text-gray-700 dark:text-gray-200"
                     />
@@ -696,7 +702,10 @@ export default function Home() {
                   <div className="flex items-center gap-1 pl-1 pr-1 shrink-0">
                     <div className="relative">
                       <button
-                        onClick={() => setShowArchiveDrawer(true)}
+                        onClick={() => {
+                          setShowArchiveDrawer(!showArchiveDrawer);
+                          setShowSuggestions(false); // 互斥：关闭搜索抽屉
+                        }}
                         className="flex items-center justify-center gap-1.5 px-3 h-[40px] rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 text-gray-600 dark:text-gray-400 transition-colors"
                       >
                         <Calendar className="w-4 h-4" />
@@ -729,6 +738,13 @@ export default function Home() {
                 {/* Smart Suggestions Dropdown - Moved Outside for Overflow Visibility */}
                 {showSuggestions && (trendingNow.length > 0 || hotKeywords.length > 0 || hotSources.length > 0) && !searchInput && (
                   <div className="absolute top-[65px] left-4 right-4 w-auto bg-white/95 dark:bg-[#1e1e1e]/95 backdrop-blur-md rounded-xl shadow-lg border border-gray-100 dark:border-white/5 p-3 animate-in slide-in-from-top-2 fade-in duration-200 z-50">
+                    {/* 关闭按钮 */}
+                    <button
+                      onClick={() => setShowSuggestions(false)}
+                      className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 transition-colors"
+                    >
+                      <X className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
+                    </button>
                     {trendingNow.length > 0 && (
                       <div className="mb-2.5">
                         <div className="text-[10px] uppercase tracking-wider text-gray-400 mb-1.5 flex items-center gap-1">
@@ -917,13 +933,17 @@ export default function Home() {
 
 
 
-      {/* 隐形遮罩层:用于点击空白处关闭弹窗 */}
-      {showSuggestions && (trendingNow.length > 0 || hotKeywords.length > 0 || hotSources.length > 0) && !searchInput && (
-        <div
-          className="fixed inset-0 z-40 bg-transparent"
-          onClick={() => setShowSuggestions(false)}
-        />
-      )}
-    </div>
+      {/* 滚动锁定：当搜索或存档抽屉打开时 */}
+      {
+        (showSuggestions || showArchiveDrawer) && (
+          <style jsx global>{`
+          body {
+            overflow: hidden !important;
+            touch-action: none !important;
+          }
+        `}</style>
+        )
+      }
+    </div >
   );
 }
