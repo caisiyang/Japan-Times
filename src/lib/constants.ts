@@ -63,21 +63,20 @@ export const MEDIA_LOGOS: Record<string, string> = {
 // --- Bulletin Board Presets ---
 // --- Bulletin Board Presets ---
 export const BULLETIN_PRESETS = [
+    { sc: "支持日本+1", tc: "支持日本+1" },
+    { sc: "支持中国+1", tc: "支持中國+1" },
     { sc: "兼听则明", tc: "兼聽則明" },
     { sc: "保持独立思考", tc: "保持獨立思考" },
-    { sc: "换个角度看世界", tc: "換個角度看世界" },
-    { sc: "拒绝盲从，理性吃瓜", tc: "拒絕盲從，理性吃瓜" },
-    { sc: "日媒滤镜有点重", tc: "日媒濾鏡有點重" },
-    { sc: "愿世界和平", tc: "願世界和平" },
-    { sc: "一衣带水，和则两利", tc: "一衣帶水，和則兩利" },
+    { sc: "想去日本旅游啊", tc: "想去日本旅遊啊" },
+    { sc: "理性吃瓜", tc: "理性吃瓜" },
+    { sc: "愿中日友好", tc: "願中日友好" },
+    { sc: "願世界和平", tc: "願世界和平" },
+    { sc: "山川异域，风月同天", tc: "山川異域，風月同天" },
     { sc: "期待更多民间交流", tc: "期待更多民間交流" },
     { sc: "合作共赢才是硬道理", tc: "合作共贏才是硬道理" },
-    { sc: "文化无国界", tc: "文化無國界" },
-    { sc: "祖国越来越强大", tc: "祖國越來越強大" },
-    { sc: "中国速度，点赞！", tc: "中國速度，點讚！" }
+    { sc: "希望中日关系早日恢复", tc: "希望中日關係早日復原" },
 ];
 
 export const SYSTEM_BULLETINS = [
-    { id: "sys-1", content: "欢迎来到 CNJP News", isSystem: true },
-    { id: "sys-2", content: "点击右侧“发声”按钮参与讨论", isSystem: true },
+    { id: "sys-1", content: "點擊“發聲”參與討論", isSystem: true },
 ];

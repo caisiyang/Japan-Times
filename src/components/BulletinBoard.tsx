@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { X, Send } from "lucide-react";
 import { SYSTEM_BULLETINS, CATEGORY_DOT_COLORS, BULLETIN_PRESETS } from "@/lib/constants";
@@ -44,6 +44,12 @@ export default function BulletinBoard() {
     const [sending, setSending] = useState(false);
     const [cooldownRemaining, setCooldownRemaining] = useState(0);
 
+    // Scrolling state (same as CategoryNav)
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [isPaused, setIsPaused] = useState(false);
+    const animationRef = useRef<number | null>(null);
+    const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
     // Initial Load
     useEffect(() => {
         fetchBulletins();
@@ -68,6 +74,46 @@ export default function BulletinBoard() {
         }, 1000);
         return () => clearInterval(timer);
     }, [cooldownRemaining]);
+
+    // Auto-scroll animation (same speed as CategoryNav: 0.5px per frame)
+    useEffect(() => {
+        const scrollContainer = scrollRef.current;
+        if (!scrollContainer) return;
+
+        const scrollSpeed = 0.5; // Same as CategoryNav
+
+        const animate = () => {
+            if (!isPaused && scrollContainer) {
+                scrollContainer.scrollLeft += scrollSpeed;
+
+                // Infinite scroll logic
+                const oneSetWidth = scrollContainer.scrollWidth / 2;
+                if (scrollContainer.scrollLeft >= oneSetWidth) {
+                    scrollContainer.scrollLeft -= oneSetWidth;
+                }
+            }
+            animationRef.current = requestAnimationFrame(animate);
+        };
+
+        animationRef.current = requestAnimationFrame(animate);
+
+        return () => {
+            if (animationRef.current) cancelAnimationFrame(animationRef.current);
+        };
+    }, [isPaused]);
+
+    const handleInteractionStart = () => {
+        setIsPaused(true);
+        if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
+    };
+
+    const handleInteractionEnd = () => {
+        // Resume after 1 second
+        if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
+        pauseTimeoutRef.current = setTimeout(() => {
+            setIsPaused(false);
+        }, 1000);
+    };
 
     const fetchBulletins = async () => {
         try {
@@ -162,6 +208,7 @@ export default function BulletinBoard() {
         return result.sort((a, b) => b.count - a.count);
     }, [bulletins]);
 
+    // Double the list for seamless infinite scroll
     const displayList = [...aggregatedList, ...aggregatedList];
 
     // Helper to get present content
@@ -171,7 +218,6 @@ export default function BulletinBoard() {
 
     return (
         <div className="w-full mb-3">
-            {/* Exact Replica of CategoryNav Container */}
             {/* Master Standard Container */}
             <div className="w-full max-w-[600px] h-[52px] mx-auto bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 flex items-center px-1 mt-3 overflow-hidden">
 
@@ -183,9 +229,17 @@ export default function BulletinBoard() {
                     </span>
                 </div>
 
-                {/* Marquee Area */}
-                <div className="flex-1 overflow-hidden relative h-full flex items-center">
-                    <div className="inline-flex animate-marquee hover:[animation-play-state:paused] items-center">
+                {/* Scrollable Marquee Area */}
+                <div
+                    ref={scrollRef}
+                    className="flex-1 overflow-x-auto relative h-full flex items-center no-scrollbar mask-linear-fade"
+                    onMouseEnter={handleInteractionStart}
+                    onMouseLeave={handleInteractionEnd}
+                    onTouchStart={handleInteractionStart}
+                    onTouchEnd={handleInteractionEnd}
+                    style={{ scrollBehavior: 'auto' }}
+                >
+                    <div className="inline-flex items-center w-max px-2">
                         {displayList.map((item, i) => (
                             <div
                                 key={`${item.content}-${i}`}
@@ -208,7 +262,7 @@ export default function BulletinBoard() {
                     <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-[#1e1e1e] to-transparent z-10 pointer-events-none" />
                 </div>
 
-                {/* Send Button - Small & Subtle */}
+                {/* Send Button */}
                 <button
                     onClick={() => {
                         if (cooldownRemaining > 0) {
@@ -237,7 +291,7 @@ export default function BulletinBoard() {
                         className="bg-white dark:bg-[#202020] w-full max-w-sm rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200 border border-gray-100 dark:border-gray-700 max-h-[80vh] flex flex-col"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        {/* Header - Clean, No Intro Text */}
+                        {/* Header */}
                         <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
                             <h3 className="font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)]" />
@@ -279,15 +333,16 @@ export default function BulletinBoard() {
             )}
 
             <style jsx global>{`
-                @keyframes marquee {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
+                .no-scrollbar::-webkit-scrollbar {
+                    display: none;
                 }
-                .animate-marquee {
-                    animation: marquee 40s linear infinite;
-                    padding-left: 0;
-                    display: flex;
-                    width: max-content;
+                .no-scrollbar {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+                .mask-linear-fade {
+                    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+                    mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
                 }
             `}</style>
         </div>
